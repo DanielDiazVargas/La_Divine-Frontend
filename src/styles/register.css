@@ -1,0 +1,88 @@
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+}
+
+.register-container {
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid var(--secundario);
+    border-radius: 2px;
+    background-color: var(--blanco);
+}
+
+.register-header {
+    background-color: var(--secundario);
+    color: var(--primario);
+    text-align: center;
+    padding: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.register-body {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Fila para nombre y apellido lado a lado */
+.input-row {
+    display: flex;
+    gap: 12px;
+}
+
+.input-row .input-group {
+    flex: 1;
+}
+
+.register-info {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    margin-top: -8px;
+    line-height: 1.4;
+}
+
+/* Botón Registrarse */
+.btn-registrar {
+    background-color: var(--primario);
+    color: var(--blanco);
+    font-weight: bold;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 2px;
+    font-size: 1rem;
+    cursor: pointer;
+    align-self: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-registrar:hover {
+    background-color: var(--critico);
+}
+
+/* Botón Volver */
+.btn-volver {
+    background-color: transparent;
+    color: var(--primario);
+    font-weight: bold;
+    border: 2px solid var(--primario);
+    padding: 10px 30px;
+    border-radius: 2px;
+    font-size: 1rem;
+    cursor: pointer;
+    align-self: center;
+    margin-bottom: -11px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-volver:hover {
+    background-color: var(--primario);
+    color: var(--blanco);
+}
