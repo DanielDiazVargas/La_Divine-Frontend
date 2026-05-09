@@ -1,3 +1,4 @@
+/* ESTRUCTURA DEL REGISTRO */
 .register {
     display: flex;
     flex-direction: column;
@@ -31,8 +32,9 @@
     gap: 20px;
 }
 
-/* Fila para nombre y apellido lado a lado */
+/* DISEÑO DE FORMULARIO COMPLEJO */
 .input-row {
+    /* Permite colocar Nombre y Apellido en la misma línea */
     display: flex;
     gap: 12px;
 }
@@ -49,7 +51,7 @@
     line-height: 1.4;
 }
 
-/* Botón Registrarse */
+/* BOTONES DE REGISTRO Y RETORNO */
 .btn-registrar {
     background-color: var(--primario);
     color: var(--blanco);
@@ -67,7 +69,6 @@
     background-color: var(--critico);
 }
 
-/* Botón Volver */
 .btn-volver {
     background-color: transparent;
     color: var(--primario);
@@ -75,11 +76,9 @@
     border: 2px solid var(--primario);
     padding: 10px 30px;
     border-radius: 2px;
-    font-size: 1rem;
     cursor: pointer;
     align-self: center;
-    margin-bottom: -11px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .btn-volver:hover {
