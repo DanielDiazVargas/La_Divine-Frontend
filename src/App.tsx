@@ -2,10 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
+import ProtectedRoute from "./components/ProtectedRoute"; 
 
 /**
  * Componente raíz que define la estructura de navegación de la aplicación.
- * Utiliza React Router para gestionar el cambio de páginas sin recargar el navegador.
+ * Utiliza React Router para gestionar el cambio de páginas sin recargar el navegador,
+ * implementando protección para las rutas que requieren sesión activa.
  */
 function App() {
   return (
@@ -16,8 +18,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         
-        {/* Ruta protegida que contiene el panel principal y sus sub-rutas */}
-        <Route path="/dashboard/*" element={<Dashboard />} />
+        {/* Rutas protegidas mediante validación de credenciales */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard/*" element={<Dashboard />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -1,8 +1,12 @@
 /**
- * URLs base para la conexión con el servidor local de C#.
+ * Se define la URL base de la API utilizando variables de entorno.
+ * En desarrollo local apuntará a localhost, y en producción a la URL de Render.
  */
-const API = "https://localhost:7283/api/Auth";
-const USER_API = "https://localhost:7283/api/User";
+const BASE_URL = import.meta.env.VITE_API_BACKEND;
+
+// Se construyen las rutas específicas concatenando la base con el controlador correspondiente
+const API = `${BASE_URL}/Auth`;
+const USER_API = `${BASE_URL}/User`;
 
 // Recupera el token de sesión almacenado en el navegador
 const getToken = () => localStorage.getItem("token");

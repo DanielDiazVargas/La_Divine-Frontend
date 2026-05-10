@@ -11,10 +11,8 @@ import { register } from '../services/AuthServices';
 function Register() {
   const navigate = useNavigate();
   
-  // Almacena mensajes de error devueltos por el servidor (ej: RUT duplicado)
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Objeto que agrupa los campos del formulario de registro
   const [formData, setFormData] = useState({
         name: '',
         lastName: '',
@@ -24,16 +22,37 @@ function Register() {
     });
 
   /**
-   * Procesa el envío del formulario, llamando al servicio de registro
-   * y redirigiendo al login con un mensaje de éxito si la operación es correcta.
+   * Controla la entrada del teléfono, eliminando caracteres no numéricos
+   * y limitando la longitud para cumplir con el formato estándar.
+   */
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      let inputValue = e.target.value;
+      
+      // Se suprimen letras y símbolos mediante expresión regular
+      inputValue = inputValue.replace(/\D/g, '');
+
+      // Se restringe la longitud a un máximo de 9 dígitos
+      if (inputValue.length <= 9) {
+          setFormData({ ...formData, phone: inputValue });
+      }
+  };
+
+  /**
+   * Procesa el envío del formulario, aplicando validaciones estrictas
+   * antes de llamar al servicio de registro.
    */
   const handleRegistro = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Se valida el número de teléfono
+        if (formData.phone.length !== 9) {
+            setErrorMsg("Atención: El número de teléfono debe tener exactamente 9 dígitos.");
+            return;
+        }
+
         try {
             await register(formData);
 
-            // Redirección al Login pasando el mensaje de éxito en el estado de la ruta
             navigate("/login", { 
                 state: { mensajeExito: "¡Registro exitoso! Revisa tu correo electrónico para obtener tu contraseña." } 
             });
@@ -99,12 +118,13 @@ function Register() {
                 </div>
                 <div className="input-group">
                     <div className="input-icon">📞</div>
+                    {/* Se reemplaza type="tel" por "text" para mayor control sobre los caracteres permitidos */}
                     <input 
-                        type="tel" 
+                        type="text" 
                         className="input-field" 
-                        placeholder="Teléfono de contacto" 
+                        placeholder="Teléfono (9 dígitos)" 
                         value={formData.phone}
-                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                        onChange={handlePhoneChange}
                         required 
                     />
                 </div>
