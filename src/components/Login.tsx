@@ -87,7 +87,6 @@ function Login() {
                     />
                 </div>
                 
-                <button type="button" className="btn-olvido">¿Olvidó su contraseña?</button>
                 <button type="submit" className="btn-ingresar">Ingresar</button>
                 
                 <div className="login-divider">
