@@ -29,18 +29,13 @@
     padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
 }
 
-/* DISEÑO DE FORMULARIO COMPLEJO */
 .input-row {
-    /* Permite colocar Nombre y Apellido en la misma línea */
     display: flex;
     gap: 12px;
-}
-
-.input-row .input-group {
-    flex: 1;
+    align-items: flex-start;
 }
 
 .register-info {
@@ -86,6 +81,7 @@
     color: var(--blanco);
 }
 
+/* Wrapper para campos del input-row (Nombre y Apellido) */
 .input-group-wrapper {
     display: flex;
     flex-direction: column;
@@ -94,19 +90,20 @@
     gap: 3px;
 }
 
+/* Wrapper para campos individuales fuera del input-row */
 .input-field-wrapper {
     display: flex;
     flex-direction: column;
-    padding-bottom: 18px;
     gap: 3px;
 }
 
+/* Mensaje de error — min-height reserva espacio fijo para evitar saltos en el layout */
 .field-error {
     color: #f56558;
     font-size: 0.72rem;
-    min-height: 0.9rem;
-
     word-break: break-word;
+    min-height: 0.9rem;
+    line-height: 1.2;
 }
 
 .error-banner {
