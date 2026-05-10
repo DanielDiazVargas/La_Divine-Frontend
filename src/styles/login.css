@@ -119,8 +119,6 @@ body {
     font-size: 1rem;
     cursor: pointer;
     align-self: center;
-    margin-bottom: -11px;
-    margin-top: -5px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -150,7 +148,7 @@ body {
     padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 12px;
 }
 
 
@@ -236,4 +234,18 @@ body {
 .btn-olvido:hover {
 
     color: var(--critico);
+}
+
+.input-field-wrapper {
+    position: relative;
+    padding-bottom: 18px;
+}
+
+.field-error {
+    color: #f56558;
+    font-size: 0.72rem;
+    word-break: break-word;
+    position: absolute;
+    bottom: 2px;
+    left: 0;
 }

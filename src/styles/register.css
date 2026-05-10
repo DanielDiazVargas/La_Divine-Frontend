@@ -29,7 +29,7 @@
     padding: 30px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 8px;
 }
 
 /* DISEÑO DE FORMULARIO COMPLEJO */
@@ -84,4 +84,33 @@
 .btn-volver:hover {
     background-color: var(--primario);
     color: var(--blanco);
+}
+
+.input-group-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    gap: 3px;
+}
+
+.input-field-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 18px;
+    gap: 3px;
+}
+
+.field-error {
+    color: #f56558;
+    font-size: 0.72rem;
+    min-height: 0.9rem;
+
+    word-break: break-word;
+}
+
+.error-banner {
+    color: #f56558;
+    font-size: 0.85rem;
+    text-align: center;
 }

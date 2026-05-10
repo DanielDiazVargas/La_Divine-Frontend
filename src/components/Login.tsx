@@ -18,6 +18,9 @@ function Login() {
   // Mensaje de error para mostrar fallos en la autenticación
   const [errorMsg, setErrorMsg] = useState('');
 
+  // Errores de validación por campo individual
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   // Objeto que captura los datos del formulario de ingreso
   const [credenciales, setCredenciales] = useState({
     email: '',
@@ -26,11 +29,29 @@ function Login() {
 
   /**
    * Procesa el intento de login, guarda el token en el almacenamiento local y redirige.
+   * Aplica validación de formato de correo antes de enviar la petición al backend.
    */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setExitoMsg("");
     setErrorMsg("");
+
+    // Se valida el formato del correo antes de enviar la petición
+    const errors: Record<string, string> = {};
+    if (!credenciales.email.trim())
+      errors.email = 'Falta completar el campo Correo Electrónico';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credenciales.email))
+      errors.email = 'El correo electrónico no tiene un formato válido';
+    if (!credenciales.password.trim())
+      errors.password = 'Falta completar el campo Contraseña';
+
+    // Si existen errores de validación, se detiene el envío y se muestran
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+
+    setFieldErrors({});
 
     try {
       const data = await login(credenciales.email, credenciales.password);
@@ -63,28 +84,34 @@ function Login() {
                 </div>
             )}
             
-            <form className="login-body" onSubmit={handleLogin}>
-                <div className="input-group">
-                    <div className="input-icon">👤</div>
-                    <input 
-                        type="email" 
-                        className="input-field" 
-                        placeholder="Correo Electrónico" 
-                        value={credenciales.email}
-                        onChange={(e) => setCredenciales({...credenciales, email: e.target.value})}
-                        required 
-                    />
+            {/* noValidate desactiva los tooltips nativos del navegador en favor de la validación personalizada */}
+            <form className="login-body" onSubmit={handleLogin} noValidate>
+                <div className="input-field-wrapper">
+                    <div className="input-group">
+                        <div className="input-icon">👤</div>
+                        <input 
+                            type="email" 
+                            className="input-field" 
+                            placeholder="Correo Electrónico" 
+                            value={credenciales.email}
+                            onChange={(e) => setCredenciales({...credenciales, email: e.target.value})}
+                        />
+                    </div>
+                    <span className="field-error">{fieldErrors.email || ''}</span>
                 </div>
-                <div className="input-group">
-                    <div className="input-icon">🔒</div>
-                    <input 
-                        type="password" 
-                        className="input-field" 
-                        placeholder="Contraseña" 
-                        value={credenciales.password}
-                        onChange={(e) => setCredenciales({...credenciales, password: e.target.value})}
-                        required 
-                    />
+
+                <div className="input-field-wrapper">
+                    <div className="input-group">
+                        <div className="input-icon">🔒</div>
+                        <input 
+                            type="password" 
+                            className="input-field" 
+                            placeholder="Contraseña" 
+                            value={credenciales.password}
+                            onChange={(e) => setCredenciales({...credenciales, password: e.target.value})}
+                        />
+                    </div>
+                    <span className="field-error">{fieldErrors.password || ''}</span>
                 </div>
                 
                 <button type="submit" className="btn-ingresar">Ingresar</button>
