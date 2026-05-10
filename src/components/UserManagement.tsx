@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+// Asegúrate de importar tus servicios correctamente
 import { getUsers, toggleUserStatus } from "../services/AuthServices";
 
 interface User {
@@ -14,72 +15,83 @@ interface User {
 
 /**
  * Componente de administración para gestionar usuarios.
- * Permite listar usuarios y cambiar su estado de acceso mediante un modal de confirmación.
+ * Cumple con Req USU-003: Listar, buscar por correo, y cambiar estado con doble confirmación.
  */
 function UserManagement() {
-    // Lista de usuarios recuperada desde la API
     const [users, setUsers] = useState<User[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]); // Usuarios que se muestran en la tabla
     
-    // Almacena mensajes de error generales de la tabla
-    const [error, setError] = useState("");
-    
-    // Indica si la tabla está cargando datos inicialmente
     const [isLoading, setIsLoading] = useState(true);
+    const [globalError, setGlobalError] = useState("");
 
-    // Estado para controlar la visibilidad del modal de confirmación
+    // Estados para la funcionalidad de búsqueda por correo
+    const [searchEmail, setSearchEmail] = useState("");
+    const [searchError, setSearchError] = useState("");
+
+    // Estados para el Modal de doble confirmación
     const [showModal, setShowModal] = useState(false);
-    
-    // Referencia temporal al usuario seleccionado para cambiar su estado
     const [userToToggle, setUserToToggle] = useState<{id: number, status: boolean} | null>(null);
 
-    // --- NUEVOS ESTADOS PARA EL REQUERIMIENTO ---
-    const [emailInput, setEmailInput] = useState("");
-    const [emailError, setEmailError] = useState("");
-
+    // Carga inicial de usuarios
     useEffect(() => {
         getUsers()
-            .then(setUsers)
-            .catch(() => setError("No se pudo cargar la lista de usuarios."))
+            .then((data) => {
+                setUsers(data);
+                setFilteredUsers(data); // Inicialmente mostramos todos
+            })
+            .catch(() => setGlobalError("No se pudo cargar la lista de usuarios."))
             .finally(() => setIsLoading(false));
     }, []);
 
     /**
-     * Valida el correo ingresado manualmente según los requerimientos.
+     * Lógica de búsqueda requerida por la ERS
      */
-    const handleToggleByEmail = () => {
-        setEmailError(""); // Limpiamos errores previos
+    const handleSearch = () => {
+        setSearchError(""); // Limpiar errores previos
 
-        if (!emailInput.trim()) {
-            setEmailError("Por favor, ingrese un correo electrónico.");
+        // Si el buscador está vacío, restauramos la tabla completa
+        if (searchEmail.trim() === "") {
+            setFilteredUsers(users);
             return;
         }
 
-        // Buscamos si el correo existe en nuestra lista actual
-        const foundUser = users.find(u => u.email.toLowerCase() === emailInput.toLowerCase().trim());
+        // Filtramos buscando coincidencias con el correo ingresado
+        const results = users.filter(u => 
+            u.email.toLowerCase().includes(searchEmail.toLowerCase().trim())
+        );
 
-        if (!foundUser) {
-            // Mensaje EXACTO requerido por la ERS
-            setEmailError("El correo electrónico ingresado no se encuentra registrado");
-            return;
+        if (results.length === 0) {
+            // MENSAJE TEXTUAL Y EXACTO DE LA ERS
+            setSearchError("El correo electrónico ingresado no se encuentra registrado");
+            setFilteredUsers([]); // Vaciamos la tabla porque no hubo coincidencias
+        } else {
+            setFilteredUsers(results);
         }
-
-        // Si existe, abrimos el modal de confirmación con los datos de ese usuario
-        openConfirmModal(foundUser.id, foundUser.status);
-        setEmailInput(""); // Limpiamos el input
     };
 
     /**
-     * Prepara el cambio de estado abriendo el modal y guardando los datos del usuario.
+     * Si el usuario borra todo en el buscador, restauramos la lista para mejor UX
+     */
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchEmail(value);
+        if (value === "") {
+            setSearchError("");
+            setFilteredUsers(users);
+        }
+    };
+
+    /**
+     * Prepara el cambio de estado (Abre el Modal)
      */
     const openConfirmModal = (id: number, status: boolean) => {
-        setError("");
-        setEmailError("");
+        setGlobalError("");
         setUserToToggle({ id, status });
         setShowModal(true);
     };
 
     /**
-     * Ejecuta la actualización de estado en el servidor y sincroniza la interfaz local.
+     * Confirma el cambio (Envía al backend)
      */
     const confirmToggle = async () => {
         if (!userToToggle) return;
@@ -87,83 +99,124 @@ function UserManagement() {
         try {
             await toggleUserStatus(userToToggle.id, !userToToggle.status);
             
-            // Actualización del estado local tras respuesta exitosa
-            setUsers(prev =>
-                prev.map(u => u.id === userToToggle.id ? { ...u, status: !userToToggle.status } : u)
+            // Actualizamos la lista principal
+            const updatedUsers = users.map(u => 
+                u.id === userToToggle.id ? { ...u, status: !userToToggle.status } : u
             );
+            
+            setUsers(updatedUsers);
+            
+            // También actualizamos la lista filtrada para que la UI no pierda el estado si hay una búsqueda activa
+            setFilteredUsers(updatedUsers.filter(u => 
+                u.email.toLowerCase().includes(searchEmail.toLowerCase().trim())
+            ));
             
             setShowModal(false);
             setUserToToggle(null);
             
         } catch {
-            setError("No se pudo cambiar el estado del usuario.");
+            setGlobalError("No se pudo cambiar el estado del usuario.");
         }
     };
 
-    if (isLoading) return <p>Cargando usuarios...</p>;
+    if (isLoading) return <p style={{ padding: "24px" }}>Cargando usuarios...</p>;
 
     return (
         <div className="dashboard-page">
-            <div className="usuarios-table-wrapper">
-                <h2>Gestionar Usuarios</h2>
+            <div className="usuarios-table-wrapper" style={{ padding: "20px" }}>
+                <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px" }}>
+                    Gestionar Usuarios
+                </h2>
                 
-                {/* --- NUEVO PANEL DE BÚSQUEDA POR CORREO --- */}
-                <div className="panel-busqueda" style={{ marginBottom: "20px", padding: "15px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
-                    <h3>Cambio Rápido por Correo</h3>
-                    <div style={{ display: "flex", gap: "10px", alignItems: "center", marginTop: "10px" }}>
+                {/* --- SECCIÓN DE BÚSQUEDA (Req: Buscar por correo electrónico) --- */}
+                <div className="search-container" style={{ margin: "20px 0" }}>
+                    <div style={{ display: "flex", gap: "10px" }}>
                         <input 
                             type="email" 
-                            placeholder="Ej: usuario@ladivine.cl" 
-                            value={emailInput}
-                            onChange={(e) => setEmailInput(e.target.value)}
-                            style={{ padding: "8px", width: "300px", borderRadius: "4px", border: "1px solid #ccc" }}
+                            placeholder="Buscar por correo electrónico..." 
+                            value={searchEmail}
+                            onChange={handleInputChange}
+                            style={{ 
+                                padding: "8px 12px", 
+                                width: "300px", 
+                                borderRadius: "4px", 
+                                border: "1px solid #ccc" 
+                            }}
                         />
-                        <button className="btn-buscar" onClick={handleToggleByEmail} style={{ padding: "8px 16px", cursor: "pointer" }}>
-                            Buscar y Modificar
+                        <button 
+                            onClick={handleSearch}
+                            style={{ 
+                                backgroundColor: "#C0A060", 
+                                color: "#fff", 
+                                border: "none", 
+                                padding: "8px 16px", 
+                                borderRadius: "4px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Buscar
                         </button>
                     </div>
-                    {/* Mensaje de error con el color exacto solicitado */}
-                    {emailError && (
-                        <p style={{ color: "#f56558", marginTop: "10px", fontWeight: "bold", margin: "10px 0 0 0" }}>
-                            {emailError}
+
+                    {/* Validación de color #f56558 requerida por la ERS */}
+                    {searchError && (
+                        <p style={{ color: "#f56558", fontWeight: "bold", marginTop: "10px" }}>
+                            {searchError}
                         </p>
                     )}
                 </div>
-                {/* ------------------------------------------- */}
 
-                {error && <p style={{ color: "#f56558", padding: "0 24px" }}>{error}</p>}
+                {globalError && <p style={{ color: "#f56558", fontWeight: "bold" }}>{globalError}</p>}
 
-                <table className="usuarios-table">
+                {/* --- TABLA DE USUARIOS --- */}
+                <table className="usuarios-table" style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
                     <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Apellido</th>
-                            <th>Correo</th>
-                            <th>RUT</th>
-                            <th>Teléfono</th>
-                            <th>Rol</th>
-                            <th>Estado</th>
-                            <th>Acción</th>
+                        <tr style={{ backgroundColor: "#8B0000", color: "#fff", textAlign: "left" }}>
+                            <th style={{ padding: "12px" }}>Nombre</th>
+                            <th style={{ padding: "12px" }}>Apellido</th>
+                            <th style={{ padding: "12px" }}>Correo</th>
+                            <th style={{ padding: "12px" }}>RUT</th>
+                            <th style={{ padding: "12px" }}>Teléfono</th>
+                            <th style={{ padding: "12px" }}>Rol</th>
+                            <th style={{ padding: "12px" }}>Estado</th>
+                            <th style={{ padding: "12px" }}>Acción</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map(u => (
-                            <tr key={u.id}>
-                                <td>{u.name}</td>
-                                <td>{u.lastName}</td>
-                                <td>{u.email}</td>
-                                <td>{u.rut}</td>
-                                <td>{u.phone}</td>
-                                <td>{u.role}</td>
-                                <td>
-                                    <span className={`badge ${u.status ? "activo" : "inactivo"}`}>
+                        {filteredUsers.map(u => (
+                            <tr key={u.id} style={{ borderBottom: "1px solid #eee" }}>
+                                <td style={{ padding: "12px" }}>{u.name}</td>
+                                <td style={{ padding: "12px" }}>{u.lastName}</td>
+                                <td style={{ padding: "12px" }}>{u.email}</td>
+                                <td style={{ padding: "12px" }}>{u.rut}</td>
+                                <td style={{ padding: "12px" }}>{u.phone}</td>
+                                <td style={{ padding: "12px" }}>{u.role}</td>
+                                <td style={{ padding: "12px" }}>
+                                    <span className={`badge ${u.status ? "activo" : "inactivo"}`} 
+                                          style={{
+                                              padding: "4px 8px", 
+                                              borderRadius: "12px", 
+                                              backgroundColor: u.status ? "#e6f4ea" : "#fce8e6",
+                                              color: u.status ? "#137333" : "#c5221f",
+                                              fontWeight: "bold",
+                                              fontSize: "0.85em"
+                                          }}>
                                         {u.status ? "Activo" : "Inactivo"}
                                     </span>
                                 </td>
-                                <td>
+                                <td style={{ padding: "12px" }}>
                                     <button
                                         className={`btn-toggle ${u.status ? "deshabilitar" : "habilitar"}`}
                                         onClick={() => openConfirmModal(u.id, u.status)}
+                                        style={{
+                                            backgroundColor: u.status ? "#D64045" : "#4CAF50",
+                                            color: "white",
+                                            border: "none",
+                                            padding: "6px 12px",
+                                            borderRadius: "4px",
+                                            cursor: "pointer"
+                                        }}
                                     >
                                         {u.status ? "Deshabilitar" : "Habilitar"}
                                     </button>
@@ -174,19 +227,31 @@ function UserManagement() {
                 </table>
             </div>
 
-            {/* Modal de confirmación */}
+            {/* --- MODAL DE DOBLE CONFIRMACIÓN --- */}
             {showModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <h3>Confirmar Acción</h3>
-                        <p>
+                <div className="modal-overlay" style={{
+                    position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: "rgba(0,0,0,0.5)", display: "flex", 
+                    justifyContent: "center", alignItems: "center"
+                }}>
+                    <div className="modal-content" style={{
+                        backgroundColor: "#fff", padding: "24px", borderRadius: "8px",
+                        width: "400px", textAlign: "center", boxShadow: "0 4px 6px rgba(0,0,0,0.1)"
+                    }}>
+                        <h3 style={{ color: "#8B0000", marginTop: 0 }}>Confirmar Acción</h3>
+                        <p style={{ margin: "20px 0" }}>
                             ¿Estás seguro que deseas <strong>{userToToggle?.status ? "DESHABILITAR" : "HABILITAR"}</strong> a este usuario?
                         </p>
-                        <div className="modal-actions">
-                            <button className="btn-cancelar" onClick={() => setShowModal(false)}>
+                        <div className="modal-actions" style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                            <button onClick={() => setShowModal(false)} style={{
+                                flex: 1, padding: "10px", backgroundColor: "#ccc", border: "none", borderRadius: "4px", cursor: "pointer"
+                            }}>
                                 Cancelar
                             </button>
-                            <button className="btn-confirmar-modal" onClick={confirmToggle}>
+                            <button onClick={confirmToggle} style={{
+                                flex: 1, padding: "10px", backgroundColor: userToToggle?.status ? "#D64045" : "#4CAF50", 
+                                color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold"
+                            }}>
                                 Confirmar Cambio
                             </button>
                         </div>
