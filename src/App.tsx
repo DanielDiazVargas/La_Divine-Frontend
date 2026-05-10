@@ -3,6 +3,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute"; 
+import PublicRoute from "./components/ProtectedRoute";
 
 /**
  * Componente raíz que define la estructura de navegación de la aplicación.
@@ -14,10 +15,12 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Rutas públicas de acceso inicial */}
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        
+        <Route element={<PublicRoute />}>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
+
         {/* Rutas protegidas mediante validación de credenciales */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard/*" element={<Dashboard />} />
