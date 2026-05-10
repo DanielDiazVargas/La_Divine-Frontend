@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
-import logoUrl from "../assets/icons/LogoLaDivine.svg";
+// import logoUrl from "../assets/icons/LogoLaDivine.svg";
 import MyProfile from "./MyProfile";
 import ChangePassword from "./ChangePassword"; 
 import UserManagement from "./UserManagement";
