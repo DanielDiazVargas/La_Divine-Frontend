@@ -20,7 +20,7 @@ function UserManagement() {
     // Lista de usuarios recuperada desde la API
     const [users, setUsers] = useState<User[]>([]);
     
-    // Almacena mensajes de error para feedback visual
+    // Almacena mensajes de error generales de la tabla
     const [error, setError] = useState("");
     
     // Indica si la tabla está cargando datos inicialmente
@@ -32,6 +32,10 @@ function UserManagement() {
     // Referencia temporal al usuario seleccionado para cambiar su estado
     const [userToToggle, setUserToToggle] = useState<{id: number, status: boolean} | null>(null);
 
+    // --- NUEVOS ESTADOS PARA EL REQUERIMIENTO ---
+    const [emailInput, setEmailInput] = useState("");
+    const [emailError, setEmailError] = useState("");
+
     useEffect(() => {
         getUsers()
             .then(setUsers)
@@ -40,10 +44,36 @@ function UserManagement() {
     }, []);
 
     /**
+     * Valida el correo ingresado manualmente según los requerimientos.
+     */
+    const handleToggleByEmail = () => {
+        setEmailError(""); // Limpiamos errores previos
+
+        if (!emailInput.trim()) {
+            setEmailError("Por favor, ingrese un correo electrónico.");
+            return;
+        }
+
+        // Buscamos si el correo existe en nuestra lista actual
+        const foundUser = users.find(u => u.email.toLowerCase() === emailInput.toLowerCase().trim());
+
+        if (!foundUser) {
+            // Mensaje EXACTO requerido por la ERS
+            setEmailError("El correo electrónico ingresado no se encuentra registrado");
+            return;
+        }
+
+        // Si existe, abrimos el modal de confirmación con los datos de ese usuario
+        openConfirmModal(foundUser.id, foundUser.status);
+        setEmailInput(""); // Limpiamos el input
+    };
+
+    /**
      * Prepara el cambio de estado abriendo el modal y guardando los datos del usuario.
      */
     const openConfirmModal = (id: number, status: boolean) => {
         setError("");
+        setEmailError("");
         setUserToToggle({ id, status });
         setShowModal(true);
     };
@@ -75,9 +105,33 @@ function UserManagement() {
     return (
         <div className="dashboard-page">
             <div className="usuarios-table-wrapper">
-                <h2> Gestionar Usuarios</h2>
+                <h2>Gestionar Usuarios</h2>
                 
-                {error && <p className="error-msg" style={{ padding: "0 24px" }}>{error}</p>}
+                {/* --- NUEVO PANEL DE BÚSQUEDA POR CORREO --- */}
+                <div className="panel-busqueda" style={{ marginBottom: "20px", padding: "15px", backgroundColor: "#f9f9f9", borderRadius: "8px" }}>
+                    <h3>Cambio Rápido por Correo</h3>
+                    <div style={{ display: "flex", gap: "10px", alignItems: "center", marginTop: "10px" }}>
+                        <input 
+                            type="email" 
+                            placeholder="Ej: usuario@ladivine.cl" 
+                            value={emailInput}
+                            onChange={(e) => setEmailInput(e.target.value)}
+                            style={{ padding: "8px", width: "300px", borderRadius: "4px", border: "1px solid #ccc" }}
+                        />
+                        <button className="btn-buscar" onClick={handleToggleByEmail} style={{ padding: "8px 16px", cursor: "pointer" }}>
+                            Buscar y Modificar
+                        </button>
+                    </div>
+                    {/* Mensaje de error con el color exacto solicitado */}
+                    {emailError && (
+                        <p style={{ color: "#f56558", marginTop: "10px", fontWeight: "bold", margin: "10px 0 0 0" }}>
+                            {emailError}
+                        </p>
+                    )}
+                </div>
+                {/* ------------------------------------------- */}
+
+                {error && <p style={{ color: "#f56558", padding: "0 24px" }}>{error}</p>}
 
                 <table className="usuarios-table">
                     <thead>
@@ -120,7 +174,7 @@ function UserManagement() {
                 </table>
             </div>
 
-            {/* Modal de confirmación para evitar cambios accidentales */}
+            {/* Modal de confirmación */}
             {showModal && (
                 <div className="modal-overlay">
                     <div className="modal-content">
