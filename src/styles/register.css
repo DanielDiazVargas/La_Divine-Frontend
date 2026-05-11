@@ -1,0 +1,113 @@
+/* ESTRUCTURA DEL REGISTRO */
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    padding: 20px;
+}
+
+.register-container {
+    width: 100%;
+    max-width: 450px;
+    border: 1px solid var(--secundario);
+    border-radius: 2px;
+    background-color: var(--blanco);
+}
+
+.register-header {
+    background-color: var(--secundario);
+    color: var(--primario);
+    text-align: center;
+    padding: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.register-body {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.register-info {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    margin-top: -8px;
+    line-height: 1.4;
+}
+
+/* BOTONES DE REGISTRO Y RETORNO */
+.btn-registrar {
+    background-color: var(--primario);
+    color: var(--blanco);
+    font-weight: bold;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 2px;
+    font-size: 1rem;
+    cursor: pointer;
+    align-self: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-registrar:hover {
+    background-color: var(--critico);
+}
+
+.btn-volver {
+    background-color: transparent;
+    color: var(--primario);
+    font-weight: bold;
+    border: 2px solid var(--primario);
+    padding: 10px 30px;
+    border-radius: 2px;
+    cursor: pointer;
+    align-self: center;
+    transition: all 0.3s ease;
+}
+
+.btn-volver:hover {
+    background-color: var(--primario);
+    color: var(--blanco);
+}
+
+/* Wrapper para campos del input-row (Nombre y Apellido) */
+.input-group-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    gap: 3px;
+}
+
+/* Wrapper para campos individuales fuera del input-row */
+.input-field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+/* Mensaje de error — min-height reserva espacio fijo para evitar saltos en el layout */
+.field-error {
+    color: #f56558;
+    font-size: 0.72rem;
+    word-break: break-word;
+    min-height: 0.9rem;
+    line-height: 1.2;
+}
+
+.error-banner {
+    color: #f56558;
+    font-size: 0.85rem;
+    text-align: center;
+}
