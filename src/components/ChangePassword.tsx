@@ -60,9 +60,9 @@ function ChangePasswordUser() {
         setIsLoading(true);
         
         try {
-            await changePassword(currentPassword, newPassword);
+            await changePassword(currentPassword, newPassword, confirmPassword);
             
-            setSuccessMessage("✅ Contraseña cambiada exitosamente.");
+            setSuccessMessage("Contraseña cambiada exitosamente.");
             setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");

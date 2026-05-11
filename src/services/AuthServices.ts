@@ -5,8 +5,8 @@
 const BASE_URL = import.meta.env.VITE_API_BACKEND;
 
 // Se construyen las rutas específicas concatenando la base con el controlador correspondiente
-const API = `${BASE_URL}/Auth`;
-const USER_API = `${BASE_URL}/User`;
+const API = `${BASE_URL}/api/Auth`;
+const USER_API = `${BASE_URL}/api/User`;
 
 // Recupera el token de sesión almacenado en el navegador
 const getToken = () => localStorage.getItem("token");
@@ -106,14 +106,36 @@ export const toggleUserStatus = async (id: number, newStatus: boolean) => {
 
 /**
  * Actualiza la contraseña del usuario logueado validando su contraseña actual.
+ * Conectado al nuevo endpoint [HttpPost] y alineado con ChangePasswordDto.
  */
-export const changePassword = async (currentPassword: string, newPassword: string) => {
+export const changePassword = async (actual: string, nueva: string, confirmar: string) => {
     const response = await fetch(`${USER_API}/cambiar-contrasena`, {
-        method: "PUT",
+        method: "POST",
         headers: buildHeaders(),
-        body: JSON.stringify({ actual: currentPassword, nueva: newPassword })
+        body: JSON.stringify({
+            ContrasenaActual: actual,
+            NuevaContrasena: nueva,
+            ConfirmarContrasena: confirmar
+        })
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.mensaje || "Error al cambiar contraseña");
+
+    const text = await response.text();
+
+    if (!text) {
+        if (response.ok) return { success: true, message: "Contraseña actualizada correctamente" };
+        throw new Error("El servidor no respondió correctamente.");
+    }
+
+    let data: any;
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error("Respuesta inesperada del servidor.");
+    }
+
+    if (!response.ok) {
+        throw new Error(data.message || "Error al cambiar la contraseña");
+    }
+
     return data;
 };

@@ -79,8 +79,9 @@ Ejemplo de uso en CSS:
 ## 💻 Estándares de programación
 
 ### 🔹 Idioma
-* **Código Fuente:** Estrictamente en **Inglés** (componentes, hooks, variables, rutas).
-* **Documentación:** El README.md y comentarios en **Español**.
+* **Código Fuente:** En **Inglés** (componentes, hooks, variables, rutas).  
+  > ⚠️ Se reconoce que existen algunos deslices puntuales en español dentro del código fuente (principalmente en nombres de funciones y variables de servicios), los cuales no afectan el funcionamiento del sistema y serán corregidos en futuras iteraciones.
+* **Documentación:** El README.md, documentación y comentarios en **Español**.
 
 ### 🔹 Nombres
 * Componentes React e Interfaces TS: PascalCase
