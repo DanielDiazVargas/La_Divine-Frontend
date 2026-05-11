@@ -106,14 +106,30 @@ export const toggleUserStatus = async (id: number, newStatus: boolean) => {
 
 /**
  * Actualiza la contraseña del usuario logueado validando su contraseña actual.
+ * Conectado al nuevo endpoint [HttpPost] y alineado con ChangePasswordDto.
  */
-export const changePassword = async (currentPassword: string, newPassword: string) => {
+export const changePassword = async (actual: string, nueva: string, confirmar: string) => {
     const response = await fetch(`${USER_API}/cambiar-contrasena`, {
-        method: "PUT",
+        method: "POST",
         headers: buildHeaders(),
-        body: JSON.stringify({ actual: currentPassword, nueva: newPassword })
+        body: JSON.stringify({
+            contrasenaActual: actual,
+            nuevaContrasena: nueva,
+            confirmarContrasena: confirmar
+        }) 
     });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.mensaje || "Error al cambiar contraseña");
+
+    const textResponse = await response.text(); 
+    
+    if (!textResponse) {
+        throw new Error("El servidor no respondió. Verifica la conexión.");
+    }
+
+    const data = JSON.parse(textResponse);
+
+    if (!response.ok) {
+        throw new Error(data.message || "Error al cambiar la contraseña");
+    }
+    
     return data;
 };
