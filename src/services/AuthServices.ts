@@ -113,23 +113,29 @@ export const changePassword = async (actual: string, nueva: string, confirmar: s
         method: "POST",
         headers: buildHeaders(),
         body: JSON.stringify({
-            contrasenaActual: actual,
-            nuevaContrasena: nueva,
-            confirmarContrasena: confirmar
-        }) 
+            ContrasenaActual: actual,
+            NuevaContrasena: nueva,
+            ConfirmarContrasena: confirmar
+        })
     });
 
-    const textResponse = await response.text(); 
-    
-    if (!textResponse) {
-        throw new Error("El servidor no respondió. Verifica la conexión.");
+    const text = await response.text();
+
+    if (!text) {
+        if (response.ok) return { success: true, message: "Contraseña actualizada correctamente" };
+        throw new Error("El servidor no respondió correctamente.");
     }
 
-    const data = JSON.parse(textResponse);
+    let data: any;
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error("Respuesta inesperada del servidor.");
+    }
 
     if (!response.ok) {
         throw new Error(data.message || "Error al cambiar la contraseña");
     }
-    
+
     return data;
 };
