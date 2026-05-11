@@ -5,8 +5,8 @@
 const BASE_URL = import.meta.env.VITE_API_BACKEND;
 
 // Se construyen las rutas específicas concatenando la base con el controlador correspondiente
-const API = `${BASE_URL}/Auth`;
-const USER_API = `${BASE_URL}/User`;
+const API = `${BASE_URL}/api/Auth`;
+const USER_API = `${BASE_URL}/api/User`;
 
 // Recupera el token de sesión almacenado en el navegador
 const getToken = () => localStorage.getItem("token");
