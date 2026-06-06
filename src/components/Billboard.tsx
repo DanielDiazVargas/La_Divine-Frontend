@@ -87,7 +87,6 @@ function Billboard() {
         return (
             <SeatMap
                 functionId={selectedFunction.id}
-                basePrice={selectedFunction.basePrice}
                 functionName={selectedFunction.name}
                 onBack={handleBackFromSeatMap}
             />
@@ -122,8 +121,6 @@ function Billboard() {
                             <p>{formatDate(selectedFunction.dateFunction)}</p>
                             <h4>Hora</h4>
                             <p>{selectedFunction.timeFunction}</p>
-                            <h4>Precio base</h4>
-                            <p>{formatPrice(selectedFunction.basePrice)}</p>
                             <h4>Asientos disponibles</h4>
                             <p>{selectedFunction.availableSeats} de {selectedFunction.totalSeats}</p>
                         </div>

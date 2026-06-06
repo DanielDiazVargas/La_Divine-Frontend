@@ -1,61 +1,122 @@
 const BASE_URL = import.meta.env.VITE_API_BACKEND;
-const RESERVATION_API = `${BASE_URL}/api/Reservation`;
+const API = `${BASE_URL}/api/Reservation`;
 
-/**
- * Recupera el token de sesión almacenado en el navegador.
- */
 const getToken = () => localStorage.getItem("token");
 
-/**
- * Cabeceras estándar con autenticación JWT.
- */
-const buildHeaders = () => ({
+const headers = () => ({
   "Content-Type": "application/json",
   Authorization: `Bearer ${getToken()}`,
 });
 
-/**
- * DTO que se envía al backend al confirmar una reserva (FUN-003).
- */
-export interface CreateReservationDto {
-  /** ID de la función seleccionada */
-  functionId: number;
-  /** IDs de negocio de los asientos seleccionados, ej. ["A1", "B3", "IZQ-A2"] */
-  seatIds: string[];
-  /** Precio total calculado en frontend: suma_zonas + cant * precioBase */
-  totalPrice: number;
+// ─── Tipos que coinciden con los DTOs del backend ────────────────────────────
+
+export interface SeatDto {
+  id: number;
+  seatNumber: string; // ej. "A1", "IZQ-A1"
+  section: string;    // "VIP Divine", "Platea", "Anfiteatro", "Galería", "Palco"
+  price: number;
+  status: number;     // 0 = Disponible, 1 = Reservado
 }
 
-/**
- * Respuesta del backend al crear una reserva.
- */
-export interface ReservationResponse {
+export interface GetSeatsResponse {
   success: boolean;
   message: string;
-  reservationCode: string;
+  data: SeatDto[];
 }
 
+export interface ReservationSeatDto {
+  id: number;
+  seatNumber: string;
+  section: string;
+  price: number;
+}
+
+export interface ReservationData {
+  id: number;
+  reservationCode: string;
+  functionId: number;
+  functionTitle: string;
+  selectedSeats: ReservationSeatDto[];
+  totalPrice: number;
+  status: number;
+  createdAt: string;
+}
+
+export interface CreateReservationResponse {
+  success: boolean;
+  message: string;
+  data: ReservationData;
+}
+
+export interface MyReservationDto {
+  reservationCode: string;
+  functionTitle: string;
+  functionDate: string;
+  functionTime: string;
+  seatCount: number;
+  totalPrice: number;
+  status: number;    // 0 = Pagada, 1 = Anulada
+  createdAt: string;
+}
+
+export interface MyReservationsResponse {
+  success: boolean;
+  message: string;
+  data: MyReservationDto[];
+}
+
+// ─── Funciones del servicio ───────────────────────────────────────────────────
+
 /**
- * Envía al backend la reserva con los asientos seleccionados.
- * El backend genera el código único de reserva (ERS FUN-003).
- *
- * Endpoint esperado: POST /api/Reservation
- * Body: { functionId, seatIds, totalPrice }
+ * GET /api/reservation/seats/{functionId}
+ * Carga los asientos reales con su estado desde la BD.
+ */
+export const getFunctionSeats = async (functionId: number): Promise<SeatDto[]> => {
+  const res = await fetch(`${API}/seats/${functionId}`, { headers: headers() });
+  const data: GetSeatsResponse = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || "Error al cargar asientos.");
+  return data.data;
+};
+
+/**
+ * POST /api/reservation
+ * Crea la reserva. SeatIds son IDs numéricos de BD.
+ * El backend calcula el precio total.
  */
 export const createReservation = async (
-  dto: CreateReservationDto
-): Promise<ReservationResponse> => {
-  const response = await fetch(RESERVATION_API, {
+  functionId: number,
+  seatIds: number[]
+): Promise<ReservationData> => {
+  const res = await fetch(API, {
     method: "POST",
-    headers: buildHeaders(),
-    body: JSON.stringify(dto),
+    headers: headers(),
+    body: JSON.stringify({ functionId, seatIds }),
   });
+  const data: CreateReservationResponse = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || "Error al crear reserva.");
+  return data.data;
+};
 
-  const data: ReservationResponse = await response.json();
+/**
+ * GET /api/reservation/my-reservations
+ * Historial de reservas del usuario autenticado (FUN-004).
+ */
+export const getMyReservations = async (): Promise<MyReservationDto[]> => {
+  const res = await fetch(`${API}/my-reservations`, { headers: headers() });
+  const data: MyReservationsResponse = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || "No hay reservas asociadas a su usuario.");
+  return data.data;
+};
 
-  if (!response.ok || !data.success) {
-    throw new Error(data.message || "Error al procesar la reserva.");
-  }
-
-  return data;
+/**
+ * DELETE /api/reservation/{code}
+ * Anula una reserva y libera sus asientos (TAR-002).
+ */
+export const cancelReservation = async (code: string): Promise<void> => {
+  const res = await fetch(`${API}/${code}`, {
+    method: "DELETE",
+    headers: headers(),
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) throw new Error(data.message || "Error al anular la reserva.");
 };

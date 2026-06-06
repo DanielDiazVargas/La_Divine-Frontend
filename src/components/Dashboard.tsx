@@ -1,68 +1,91 @@
 import { useState } from "react";
 import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
-// import logoUrl from "../assets/icons/LogoLaDivine.svg";
+
 import MyProfile from "./MyProfile";
-import ChangePassword from "./ChangePassword"; 
+import ChangePassword from "./ChangePassword";
 import UserManagement from "./UserManagement";
-import RegisterFunction from "./RegisterFunction"; 
+import RegisterFunction from "./RegisterFunction";
 import Billboard from "./Billboard";
+import MyReservations from "./MyReservations";
+
 import { getRoleFromToken } from "../services/AuthServices";
 import "../styles/dashboard.css";
 
 /**
  * Componente principal del panel de control.
- * Gestiona la navegación lateral, el control de acceso por roles y el enrutamiento interno.
+ * Gestiona la navegación lateral, el control de acceso por roles
+ * y el enrutamiento interno del sistema.
  */
 function Dashboard() {
-    // Controla si el menú lateral está visible o colapsado
     const [isMenuOpen, setIsMenuOpen] = useState(true);
-    
     const navigate = useNavigate();
     const location = useLocation();
-    
-    // Obtiene el rol del usuario (Admin/User) desde el token almacenado
     const role = getRoleFromToken();
 
-    /**
-     * Elimina el token de sesión y redirige al usuario al inicio.
-     */
     const handleLogout = () => {
         localStorage.removeItem("token");
         navigate("/");
     };
 
-    /**
-     * Verifica si una ruta está activa para aplicar visuales en el menú.
-     */
     const isActive = (path: string) =>
         location.pathname === path ? "activo" : "";
 
     return (
-        
         <div className="dashboard-layout">
             <header className="dashboard-header">
-                <button className="btn-hamburguesa" onClick={() => setIsMenuOpen(!isMenuOpen)}>☰</button>
-                {/* <img src={logoUrl} alt="Logo La Divine" className="dashboard-logo" /> */}
+                <button
+                    className="btn-hamburguesa"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                    ☰
+                </button>
                 <span className="dashboard-title">Teatro La Divine</span>
-                <button className="btn-salir" onClick={handleLogout}>Cerrar Sesión</button>
+                <button className="btn-salir" onClick={handleLogout}>
+                    Cerrar Sesión
+                </button>
             </header>
 
             <div className="dashboard-body">
                 <aside className={`dashboard-sidebar ${isMenuOpen ? "abierto" : "cerrado"}`}>
                     <ul className="sidebar-menu">
-                        <li className={isActive("/dashboard")} onClick={() => navigate("/dashboard")}>
+                        <li
+                            className={isActive("/dashboard")}
+                            onClick={() => navigate("/dashboard")}
+                        >
                             Cartelera
                         </li>
-                        <li className={isActive("/dashboard/cambiar-contrasena")} onClick={() => navigate("/dashboard/cambiar-contrasena")}>
+
+                        {/* FUN-004: Consultar Reserva — solo para clientes */}
+                        {role === "User" && (
+                            <li
+                                className={isActive("/dashboard/consultar-reserva")}
+                                onClick={() => navigate("/dashboard/consultar-reserva")}
+                            >
+                                Consultar Reserva
+                            </li>
+                        )}
+
+                        <li
+                            className={isActive("/dashboard/cambiar-contrasena")}
+                            onClick={() => navigate("/dashboard/cambiar-contrasena")}
+                        >
                             Cambiar Contraseña
                         </li>
+
                         {role === "Admin" && (
-                            <li className={isActive("/dashboard/gestionar-usuarios")} onClick={() => navigate("/dashboard/gestionar-usuarios")}>
+                            <li
+                                className={isActive("/dashboard/gestionar-usuarios")}
+                                onClick={() => navigate("/dashboard/gestionar-usuarios")}
+                            >
                                 Gestionar Usuarios
                             </li>
                         )}
+
                         {role === "Admin" && (
-                            <li className={isActive("/dashboard/Registrar-funcion")} onClick={() => navigate("/dashboard/Registrar-funcion")}>
+                            <li
+                                className={isActive("/dashboard/Registrar-funcion")}
+                                onClick={() => navigate("/dashboard/Registrar-funcion")}
+                            >
                                 Registrar función
                             </li>
                         )}
@@ -75,11 +98,27 @@ function Dashboard() {
                         <Route path="/perfil" element={<MyProfile />} />
                         <Route path="/cambiar-contrasena" element={<ChangePassword />} />
                         <Route path="/cartelera" element={<Billboard />} />
-                        {role === "Admin" && (
-                            <Route path="/gestionar-usuarios" element={<UserManagement />} />
+
+                        {/* FUN-004: historial de reservas del cliente */}
+                        {role === "User" && (
+                            <Route
+                                path="/consultar-reserva"
+                                element={<MyReservations />}
+                            />
                         )}
+
                         {role === "Admin" && (
-                            <Route path="/Registrar-funcion" element={<RegisterFunction />} />
+                            <Route
+                                path="/gestionar-usuarios"
+                                element={<UserManagement />}
+                            />
+                        )}
+
+                        {role === "Admin" && (
+                            <Route
+                                path="/Registrar-funcion"
+                                element={<RegisterFunction />}
+                            />
                         )}
                     </Routes>
                 </main>
