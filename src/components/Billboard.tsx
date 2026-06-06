@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getBillboardFunctions, type BillboardFunction } from "../services/BillboardServices";
+import SeatMap from "./SeatMap";
 
 /**
  * Componente unificado que muestra las funciones vigentes de la cartelera.
@@ -7,60 +8,38 @@ import { getBillboardFunctions, type BillboardFunction } from "../services/Billb
  * Reemplaza tanto la vista de inicio como la vista de cartelera por tabla.
  */
 function Billboard() {
-    // Funciones actualmente mostradas en la cuadrícula de cards.
     const [functions, setFunctions] = useState<BillboardFunction[]>([]);
-
-    // Filtro ingresado por nombre de obra.
     const [nameFilter, setNameFilter] = useState("");
-
-    // Filtro seleccionado por fecha.
     const [dateFilter, setDateFilter] = useState("");
-
-    // Controla el estado visual del botón Buscar.
     const [isSearching, setIsSearching] = useState(false);
-
-    // Mensaje mostrado cuando no hay funciones o cuando el filtro no arroja resultados.
     const [message, setMessage] = useState("");
-
-    // Función seleccionada para ver el detalle previo a reservar.
     const [selectedFunction, setSelectedFunction] = useState<BillboardFunction | null>(null);
 
-    /**
-     * Formatea la fecha recibida desde backend al formato dd-mm-yyyy.
-     */
+    // Controla si mostrar el mapa de asientos (FUN-003)
+    const [showSeatMap, setShowSeatMap] = useState(false);
+
     const formatDate = (date: string) => {
         const [year, month, day] = date.split("-");
         if (!year || !month || !day) return date;
         return `${day}-${month}-${year}`;
     };
 
-    /**
-     * Formatea el precio usando separador de miles chileno.
-     */
     const formatPrice = (price: number) => {
         return `$${price.toLocaleString("es-CL")}`;
     };
 
-    /**
-     * Carga la cartelera desde el backend.
-     * Cuando useFilters es true, se envían los filtros actuales.
-     */
     const loadBillboard = async (useFilters = false) => {
         setIsSearching(true);
         setMessage("");
-
         try {
             const result = await getBillboardFunctions(
                 useFilters ? nameFilter : "",
                 useFilters ? dateFilter : ""
             );
-
             setFunctions(result);
-
             if (!useFilters && result.length === 0) {
                 setMessage("No hay funciones disponibles en este momento");
             }
-
             if (useFilters && result.length === 0) {
                 setMessage("No se encontraron funciones con los criterios indicados");
             }
@@ -72,45 +51,50 @@ function Billboard() {
         }
     };
 
-    /**
-     * Carga inicial de funciones vigentes al entrar a la vista.
-     */
     useEffect(() => {
         loadBillboard(false);
     }, []);
 
-    /**
-     * Ejecuta la búsqueda cuando el usuario presiona el botón Buscar.
-     */
-    const handleSearch = () => {
-        loadBillboard(true);
-    };
+    const handleSearch = () => loadBillboard(true);
 
-    /**
-     * Limpia los filtros y recarga todas las funciones.
-     */
     const handleClearFilters = () => {
         setNameFilter("");
         setDateFilter("");
         loadBillboard(false);
     };
 
-    /**
-     * Muestra el detalle de la función seleccionada antes de iniciar una reserva.
-     */
     const handleShowDetail = (theaterFunction: BillboardFunction) => {
         setSelectedFunction(theaterFunction);
     };
 
     /**
-     * Acción temporal del botón Reservar dentro del detalle.
-     * TODO: Redirigir al requerimiento FUN-003 (Reservar Entrada) cuando sea implementado.
+     * Abre el mapa de asientos para la función seleccionada (FUN-003).
      */
     const handleReserve = () => {
-        alert("Funcionalidad Reservar Entrada aún no implementada.");
+        setShowSeatMap(true);
     };
 
-    // Vista de detalle de una función seleccionada
+    /**
+     * Vuelve a la cartelera desde el mapa de asientos.
+     */
+    const handleBackFromSeatMap = () => {
+        setShowSeatMap(false);
+        setSelectedFunction(null);
+    };
+
+    // ── Vista: Mapa de asientos ──────────────────────────────────────────────
+    if (showSeatMap && selectedFunction) {
+        return (
+            <SeatMap
+                functionId={selectedFunction.id}
+                basePrice={selectedFunction.basePrice}
+                functionName={selectedFunction.name}
+                onBack={handleBackFromSeatMap}
+            />
+        );
+    }
+
+    // ── Vista: Detalle de función ────────────────────────────────────────────
     if (selectedFunction) {
         return (
             <div className="dashboard-page">
@@ -132,19 +116,14 @@ function Billboard() {
 
                         <div className="billboard-info">
                             <h1>{selectedFunction.name}</h1>
-
                             <h4>Descripción</h4>
                             <p>{selectedFunction.description}</p>
-
                             <h4>Fecha</h4>
                             <p>{formatDate(selectedFunction.dateFunction)}</p>
-
                             <h4>Hora</h4>
                             <p>{selectedFunction.timeFunction}</p>
-
                             <h4>Precio base</h4>
                             <p>{formatPrice(selectedFunction.basePrice)}</p>
-
                             <h4>Asientos disponibles</h4>
                             <p>{selectedFunction.availableSeats} de {selectedFunction.totalSeats}</p>
                         </div>
@@ -157,7 +136,6 @@ function Billboard() {
                         >
                             Reservar
                         </button>
-
                         <button
                             className="billboard-back-button"
                             onClick={() => setSelectedFunction(null)}
@@ -170,14 +148,13 @@ function Billboard() {
         );
     }
 
-    // Vista principal: cuadrícula de cards con filtros
+    // ── Vista: Cuadrícula principal ──────────────────────────────────────────
     return (
         <div className="dashboard-page">
             <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px", marginBottom: "24px" }}>
                 Cartelera
             </h2>
 
-            {/* Filtros de búsqueda */}
             <div className="billboard-filters">
                 <input
                     type="text"
@@ -201,13 +178,9 @@ function Billboard() {
                     <button
                         onClick={handleClearFilters}
                         style={{
-                            background: "transparent",
-                            border: "1px solid #ccc",
-                            borderRadius: "4px",
-                            padding: "10px 16px",
-                            cursor: "pointer",
-                            color: "#666",
-                            fontSize: "13px"
+                            background: "transparent", border: "1px solid #ccc",
+                            borderRadius: "4px", padding: "10px 16px",
+                            cursor: "pointer", color: "#666", fontSize: "13px"
                         }}
                     >
                         Limpiar
@@ -215,30 +188,21 @@ function Billboard() {
                 )}
             </div>
 
-            {/* Mensaje de error o sin resultados */}
-            {message && (
-                <p className="billboard-error">{message}</p>
-            )}
+            {message && <p className="billboard-error">{message}</p>}
 
-            {/* Cuadrícula de cards */}
             {functions.length > 0 && (
                 <div style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-                    gap: "20px",
-                    marginTop: "8px"
+                    gap: "20px", marginTop: "8px"
                 }}>
                     {functions.map(f => (
                         <div key={f.id} style={{
-                            background: "white",
-                            border: "1px solid #C0A060",
-                            borderRadius: "8px",
-                            overflow: "hidden",
+                            background: "white", border: "1px solid #C0A060",
+                            borderRadius: "8px", overflow: "hidden",
                             boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                            display: "flex",
-                            flexDirection: "column"
+                            display: "flex", flexDirection: "column"
                         }}>
-                            {/* Área de imagen o espacio en blanco */}
                             <div style={{ height: "160px", borderBottom: "1px solid #eee" }}>
                                 {f.imageUrl ? (
                                     <img
@@ -251,7 +215,6 @@ function Billboard() {
                                 )}
                             </div>
 
-                            {/* Información de la función */}
                             <div style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "5px", flex: 1 }}>
                                 <h3 style={{ color: "#8B0000", fontSize: "14px", margin: 0 }}>{f.name}</h3>
 
@@ -270,27 +233,20 @@ function Billboard() {
                                 <p style={{ fontSize: "12px", color: "#777", margin: 0 }}>
                                     📅 {formatDate(f.dateFunction)} &nbsp;🕐 {f.timeFunction}
                                 </p>
-
                                 <p style={{ fontSize: "13px", fontWeight: "bold", color: "#8B0000", margin: 0 }}>
                                     {formatPrice(f.basePrice)}
                                 </p>
-
                                 <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>
                                     💺 {f.availableSeats}/{f.totalSeats} disponibles
                                 </p>
 
-                                {/* Botón Reservar o No disponible */}
                                 <button
                                     disabled={f.availableSeats === 0}
                                     onClick={() => handleShowDetail(f)}
                                     style={{
-                                        marginTop: "8px",
-                                        padding: "10px",
-                                        width: "100%",
-                                        border: "none",
-                                        borderRadius: "4px",
-                                        fontWeight: "bold",
-                                        fontSize: "13px",
+                                        marginTop: "8px", padding: "10px", width: "100%",
+                                        border: "none", borderRadius: "4px",
+                                        fontWeight: "bold", fontSize: "13px",
                                         cursor: f.availableSeats > 0 ? "pointer" : "not-allowed",
                                         backgroundColor: f.availableSeats > 0 ? "#00a650" : "#f56558",
                                         color: "white"
