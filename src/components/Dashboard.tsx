@@ -4,6 +4,8 @@ import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
 import MyProfile from "./MyProfile";
 import ChangePassword from "./ChangePassword"; 
 import UserManagement from "./UserManagement";
+import RegisterFunction from "./RegisterFunction"; 
+import Billboard from "./Billboard";
 import { getRoleFromToken } from "../services/AuthServices";
 import "../styles/dashboard.css";
 
@@ -49,10 +51,7 @@ function Dashboard() {
                 <aside className={`dashboard-sidebar ${isMenuOpen ? "abierto" : "cerrado"}`}>
                     <ul className="sidebar-menu">
                         <li className={isActive("/dashboard")} onClick={() => navigate("/dashboard")}>
-                            Inicio
-                        </li>
-                        <li className={isActive("/dashboard/perfil")} onClick={() => navigate("/dashboard/perfil")}>
-                            Mi Perfil
+                            Cartelera
                         </li>
                         <li className={isActive("/dashboard/cambiar-contrasena")} onClick={() => navigate("/dashboard/cambiar-contrasena")}>
                             Cambiar Contraseña
@@ -62,23 +61,25 @@ function Dashboard() {
                                 Gestionar Usuarios
                             </li>
                         )}
+                        {role === "Admin" && (
+                            <li className={isActive("/dashboard/Registrar-funcion")} onClick={() => navigate("/dashboard/Registrar-funcion")}>
+                                Registrar función
+                            </li>
+                        )}
                     </ul>
                 </aside>
 
                 <main className="dashboard-content">
                     <Routes>
-                        <Route path="/" element={
-                            <div className="dashboard-page">
-                                <h2>Bienvenido a Teatro La Divine 🎭</h2>
-                                <p style={{ marginTop: "10px", color: "#666" }}>
-                                    Selecciona una opción del menú para comenzar.
-                                </p>
-                            </div>
-                        } />
+                        <Route path="/" element={<Billboard />} />
                         <Route path="/perfil" element={<MyProfile />} />
                         <Route path="/cambiar-contrasena" element={<ChangePassword />} />
+                        <Route path="/cartelera" element={<Billboard />} />
                         {role === "Admin" && (
                             <Route path="/gestionar-usuarios" element={<UserManagement />} />
+                        )}
+                        {role === "Admin" && (
+                            <Route path="/Registrar-funcion" element={<RegisterFunction />} />
                         )}
                     </Routes>
                 </main>

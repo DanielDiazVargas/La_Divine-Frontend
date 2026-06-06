@@ -170,6 +170,7 @@ function UserManagement() {
                 {globalError && <p style={{ color: "#f56558", fontWeight: "bold" }}>{globalError}</p>}
 
                 {/* --- TABLA DE USUARIOS --- */}
+                <div style={{ overflowX: "auto", width: "100%" }}>
                 <table className="usuarios-table" style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
                     <thead>
                         <tr style={{ backgroundColor: "#8B0000", color: "#fff", textAlign: "left" }}>
@@ -178,7 +179,6 @@ function UserManagement() {
                             <th style={{ padding: "12px" }}>Correo</th>
                             <th style={{ padding: "12px" }}>RUT</th>
                             <th style={{ padding: "12px" }}>Teléfono</th>
-                            <th style={{ padding: "12px" }}>Rol</th>
                             <th style={{ padding: "12px" }}>Estado</th>
                             <th style={{ padding: "12px" }}>Acción</th>
                         </tr>
@@ -191,7 +191,6 @@ function UserManagement() {
                                 <td style={{ padding: "12px" }}>{u.email}</td>
                                 <td style={{ padding: "12px" }}>{u.rut}</td>
                                 <td style={{ padding: "12px" }}>{u.phone}</td>
-                                <td style={{ padding: "12px" }}>{u.role}</td>
                                 <td style={{ padding: "12px" }}>
                                     <span className={`badge ${u.status ? "activo" : "inactivo"}`} 
                                           style={{
@@ -226,6 +225,8 @@ function UserManagement() {
                     </tbody>
                 </table>
             </div>
+        </div>
+
 
             {/* --- MODAL DE DOBLE CONFIRMACIÓN --- */}
             {showModal && (
