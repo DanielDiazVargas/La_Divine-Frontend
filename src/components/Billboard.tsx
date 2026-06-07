@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getBillboardFunctions, type BillboardFunction } from "../services/BillboardServices";
+import { getRoleFromToken } from "../services/AuthServices";
 import SeatMap from "./SeatMap";
 
 /**
@@ -17,6 +18,10 @@ function Billboard() {
 
     // Controla si mostrar el mapa de asientos (FUN-003)
     const [showSeatMap, setShowSeatMap] = useState(false);
+
+    // Modales
+    const [showAdminModal, setShowAdminModal] = useState(false);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     const formatDate = (date: string) => {
         const [year, month, day] = date.split("-");
@@ -64,9 +69,23 @@ function Billboard() {
     };
 
     /**
-     * Abre el mapa de asientos para la función seleccionada (FUN-003).
+     * Verifica el rol antes de intentar reservar.
+     * Si es admin muestra modal de bloqueo, si es cliente muestra modal de confirmación.
      */
-    const handleReserve = () => {
+    const handleReserveClick = () => {
+        const role = getRoleFromToken();
+        if (role === "Admin") {
+            setShowAdminModal(true);
+        } else {
+            setShowConfirmModal(true);
+        }
+    };
+
+    /**
+     * Confirma la reserva y abre el mapa de asientos (FUN-003).
+     */
+    const handleConfirmReserve = () => {
+        setShowConfirmModal(false);
         setShowSeatMap(true);
     };
 
@@ -93,6 +112,79 @@ function Billboard() {
     if (selectedFunction) {
         return (
             <div className="dashboard-page">
+
+                {/* Modal: admin no puede reservar */}
+                {showAdminModal && (
+                    <div style={{
+                        position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000
+                    }}>
+                        <div style={{
+                            background: "white", borderRadius: "8px", padding: "32px",
+                            maxWidth: "400px", width: "90%", textAlign: "center",
+                            border: "1px solid #C0A060"
+                        }}>
+                            <p style={{ fontSize: "2rem", margin: "0 0 12px" }}>🚫</p>
+                            <h3 style={{ color: "#8B0000", marginBottom: "12px" }}>Acción no permitida</h3>
+                            <p style={{ color: "#555", marginBottom: "24px" }}>
+                                Los administradores no pueden reservar funciones.
+                            </p>
+                            <button
+                                onClick={() => setShowAdminModal(false)}
+                                style={{
+                                    backgroundColor: "#8B0000", color: "white", border: "none",
+                                    padding: "10px 28px", borderRadius: "4px",
+                                    fontWeight: "bold", cursor: "pointer"
+                                }}
+                            >
+                                Entendido
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* Modal: confirmación de reserva para clientes */}
+                {showConfirmModal && (
+                    <div style={{
+                        position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000
+                    }}>
+                        <div style={{
+                            background: "white", borderRadius: "8px", padding: "32px",
+                            maxWidth: "400px", width: "90%", textAlign: "center",
+                            border: "1px solid #C0A060"
+                        }}>
+                            <p style={{ fontSize: "2rem", margin: "0 0 12px" }}>🎭</p>
+                            <h3 style={{ color: "#8B0000", marginBottom: "12px" }}>Confirmar reserva</h3>
+                            <p style={{ color: "#555", marginBottom: "24px" }}>
+                                ¿Está seguro de que desea reservar para <strong>{selectedFunction.name}</strong>?
+                            </p>
+                            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+                                <button
+                                    onClick={() => setShowConfirmModal(false)}
+                                    style={{
+                                        backgroundColor: "white", color: "#555",
+                                        border: "1px solid #ccc", padding: "10px 24px",
+                                        borderRadius: "4px", fontWeight: "bold", cursor: "pointer"
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleConfirmReserve}
+                                    style={{
+                                        backgroundColor: "#00a650", color: "white", border: "none",
+                                        padding: "10px 24px", borderRadius: "4px",
+                                        fontWeight: "bold", cursor: "pointer"
+                                    }}
+                                >
+                                    Sí, reservar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <div className="billboard-card" style={{ maxWidth: "none" }}>
                     <h2>Consultar Cartelera</h2>
 
@@ -125,7 +217,7 @@ function Billboard() {
                     <div className="billboard-detail-actions">
                         <button
                             className="billboard-reserve-main"
-                            onClick={handleReserve}
+                            onClick={handleReserveClick}
                         >
                             Reservar
                         </button>
@@ -208,7 +300,8 @@ function Billboard() {
                                 )}
                             </div>
 
-                                <div style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "5px", flex: 1, justifyContent: "space-between" }}>                                <h3 style={{ color: "#8B0000", fontSize: "14px", margin: 0 }}>{f.name}</h3>
+                            <div style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "5px", flex: 1, justifyContent: "space-between" }}>
+                                <h3 style={{ color: "#8B0000", fontSize: "14px", margin: 0 }}>{f.name}</h3>
 
                                 {f.description && (
                                     <p style={{
