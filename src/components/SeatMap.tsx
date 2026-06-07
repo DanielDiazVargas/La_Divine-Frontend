@@ -32,14 +32,14 @@ interface SeatMapProps {
 
 const NS = "http://www.w3.org/2000/svg";
 
-function svgEl(tag: string, attrs: Record<string, string | number>, parent?: Element): SVGElement {
+function svgEl(tag: string, attrs: Record<string, string | number>, parent?: Element | null): SVGElement {
   const n = document.createElementNS(NS, tag) as SVGElement;
   for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, String(v));
   if (parent) parent.appendChild(n);
   return n;
 }
 
-function svgTx(s: string, x: number, y: number, attrs: Record<string, string>, parent: Element) {
+function svgTx(s: string, x: number, y: number, attrs: Record<string, string>, parent: Element | null) {
   const t = svgEl("text", { x, y, "text-anchor": "middle", "dominant-baseline": "middle", style: "pointer-events:none", ...attrs }, parent);
   t.textContent = s;
   return t;
@@ -90,7 +90,6 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
     const svg = svgRef.current;
     if (!svg) return;
     svg.innerHTML = "";
-    rectMap.current.clear();
 
     const SW = 18, SH = 15, SRX = 3;
 
@@ -217,7 +216,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
   }, [loadingSeats, loadError]);
 
   // ── Toggle asiento ─────────────────────────────────────────────────────────
-  function toggleSeat(seatNumber: string, zone: string, r: SVGElement, dto: SeatDto) {
+  function toggleSeat(_seatNumber: string, zone: string, r: SVGElement, dto: SeatDto) {
     const z = ZONES[zone];
     if (selIds.current.has(dto.id)) {
       selIds.current.delete(dto.id);
