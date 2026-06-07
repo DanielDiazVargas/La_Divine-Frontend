@@ -39,14 +39,6 @@ function MyReservations() {
             .finally(() => setIsLoading(false));
     }, []);
 
-    /**
-     * Formatea la lista de asientos como "A1, B2, C3 (3)"
-     */
-    const formatSeats = (seatNumbers: string[], count: number) => {
-        if (!seatNumbers || seatNumbers.length === 0) return `(${count})`;
-        return `${seatNumbers.join(", ")} (${count})`;
-    };
-
     if (isLoading) return <p style={{ padding: "24px" }}>Cargando reservas...</p>;
 
     return (
