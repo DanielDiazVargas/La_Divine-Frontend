@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
-
-import MyProfile from "./MyProfile";
 import ChangePassword from "./ChangePassword";
 import UserManagement from "./UserManagement";
 import RegisterFunction from "./RegisterFunction";
@@ -95,7 +93,6 @@ function Dashboard() {
                 <main className="dashboard-content">
                     <Routes>
                         <Route path="/" element={<Billboard />} />
-                        <Route path="/perfil" element={<MyProfile />} />
                         <Route path="/cambiar-contrasena" element={<ChangePassword />} />
                         <Route path="/cartelera" element={<Billboard />} />
 

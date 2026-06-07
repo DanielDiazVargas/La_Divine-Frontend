@@ -71,6 +71,9 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
   const [reserveError, setReserveError] = useState("");
   const [reservationResult, setReservationResult] = useState<ReservationData | null>(null);
 
+  // Modal de confirmación
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+
   // ── Carga asientos reales del backend ──────────────────────────────────────
   useEffect(() => {
     getFunctionSeats(functionId)
@@ -100,7 +103,6 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
     ) {
       const z = ZONES[zone];
       const dto = seatDataMap.current.get(seatNumber);
-      // Si no está en BD todavía (raro), se muestra ocupado por seguridad
       const occ = !dto || dto.status !== 0;
 
       const g = svgEl("g", {
@@ -248,9 +250,8 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
   }
 
   // ── Confirmar reserva ──────────────────────────────────────────────────────
-  async function handleConfirm() {
-    if (selectedSeats.length === 0) return;
-    if (!confirm("¿Está seguro de que desea reservar los asientos seleccionados?")) return;
+  async function handleConfirmReserve() {
+    setShowConfirmModal(false);
     setConfirming(true);
     setReserveError("");
     try {
@@ -263,7 +264,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
     }
   }
 
-  // ── Cálculo de total (suma de precios de asientos seleccionados) ────────────
+  // ── Cálculo de total ───────────────────────────────────────────────────────
   const totalPrice = selectedSeats.reduce((acc, s) => acc + s.price, 0);
 
   // ── Pantalla: cargando ─────────────────────────────────────────────────────
@@ -293,7 +294,6 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
             </p>
           </div>
 
-          {/* Código */}
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <div style={{ fontSize: 12, color: "#999", marginBottom: 4, letterSpacing: 1 }}>CÓDIGO DE RESERVA</div>
             <div style={{
@@ -306,7 +306,6 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
             </div>
           </div>
 
-          {/* Resumen */}
           <div style={{ background: "#fafafa", borderRadius: 8, border: "1px solid #eee", padding: "16px 20px", marginBottom: 20 }}>
             <div style={{ fontSize: 12, color: "#999", fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>RESUMEN</div>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
@@ -357,6 +356,55 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
   // ── Vista principal: mapa ──────────────────────────────────────────────────
   return (
     <div className="dashboard-page">
+
+      {/* Modal de confirmación de reserva */}
+      {showConfirmModal && (
+        <div style={{
+          position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000
+        }}>
+          <div style={{
+            background: "white", borderRadius: "8px", padding: "32px",
+            maxWidth: "420px", width: "90%", textAlign: "center",
+            border: "1px solid #C0A060"
+          }}>
+            <p style={{ fontSize: "2rem", margin: "0 0 12px" }}>🎭</p>
+            <h3 style={{ color: "#8B0000", marginBottom: "12px" }}>Confirmar reserva</h3>
+            <p style={{ color: "#555", marginBottom: "8px" }}>
+              Estás por reservar <strong>{selectedSeats.length} asiento{selectedSeats.length !== 1 ? "s" : ""}</strong>:
+            </p>
+            <p style={{ color: "#777", fontSize: "0.85rem", marginBottom: "8px" }}>
+              {selectedSeats.map((s) => s.seatNumber).join(", ")}
+            </p>
+            <p style={{ color: "#8B0000", fontWeight: "bold", fontSize: "1.1rem", marginBottom: "24px" }}>
+              Total: ${totalPrice.toLocaleString("es-CL")}
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center" }}>
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                style={{
+                  backgroundColor: "white", color: "#555",
+                  border: "1px solid #ccc", padding: "10px 24px",
+                  borderRadius: "4px", fontWeight: "bold", cursor: "pointer"
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleConfirmReserve}
+                style={{
+                  backgroundColor: "#8B0000", color: "white", border: "none",
+                  padding: "10px 24px", borderRadius: "4px",
+                  fontWeight: "bold", cursor: "pointer"
+                }}
+              >
+                Sí, confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
         <button
@@ -393,7 +441,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
         </div>
       </div>
 
-      {/* SVG — viewBox ajustado para que no se vea tan grande */}
+      {/* SVG */}
       <div style={{
         background: "#fff", borderRadius: 8,
         border: "1px solid #eaeaea",
@@ -439,7 +487,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
             ✕ Limpiar
           </button>
           <button
-            onClick={handleConfirm}
+            onClick={() => setShowConfirmModal(true)}
             disabled={confirming}
             style={{
               marginLeft: "auto", padding: "8px 22px", border: "none", borderRadius: 6,
@@ -447,7 +495,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
               fontWeight: 700, fontSize: 13, cursor: confirming ? "not-allowed" : "pointer"
             }}
           >
-            {confirming ? "Procesando..." : "Confirmar reserva"}
+            {confirming ? "Confirmando reserva..." : "Confirmar reserva"}
           </button>
         </div>
       )}
