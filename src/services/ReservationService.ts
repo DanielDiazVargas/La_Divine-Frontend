@@ -54,6 +54,7 @@ export interface MyReservationDto {
   functionDate: string;
   functionTime: string;
   seatCount: number;
+  seatNumbers: string[];
   totalPrice: number;
   status: number;    // 0 = Pagada, 1 = Anulada
   createdAt: string;
