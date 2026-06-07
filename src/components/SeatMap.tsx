@@ -90,7 +90,6 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
     const svg = svgRef.current;
     if (!svg) return;
     svg.innerHTML = "";
-    const svgEl2 = svg as Element
 
     const SW = 18, SH = 15, SRX = 3;
 
