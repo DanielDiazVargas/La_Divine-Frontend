@@ -74,7 +74,9 @@ function MyReservations() {
                                     <td style={{ padding: "12px" }}>{r.reservationCode}</td>
                                     <td style={{ padding: "12px" }}>{clientName}</td>
                                     <td style={{ padding: "12px" }}>{r.functionTitle}</td>
-                                    <td style={{ padding: "12px" }}>{r.functionDate}</td>
+                                    <td style={{ padding: "12px" }}>
+                                        {new Date(r.functionDate).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                                    </td>
                                     <td style={{ padding: "12px" }}>{r.functionTime}</td>
                                     <td style={{ padding: "12px" }}>{r.seatCount}</td>
                                     <td style={{ padding: "12px" }}>${r.totalPrice.toLocaleString("es-CL")}</td>

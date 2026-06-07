@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { registerFunction } from "../services/FunctionServices.ts";
+import ConfirmModal from "./ConfirmModal";
 
 function RegisterFunction() {
     const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ function RegisterFunction() {
     const [errorMsg, setErrorMsg] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,7 +42,6 @@ function RegisterFunction() {
         if (!formData.dateFunction) errors.dateFunction = "Falta completar el campo Fecha de la obra";
         if (!formData.timeFunction) errors.timeFunction = "Falta completar el campo Hora de la obra";
 
-        // Validación ERS: fecha y hora no puede ser anterior a la actual
         if (formData.dateFunction && formData.timeFunction) {
             const fechaHora = new Date(`${formData.dateFunction}T${formData.timeFunction}`);
             if (fechaHora < new Date()) {
@@ -53,9 +54,13 @@ function RegisterFunction() {
             return;
         }
 
+        setShowModal(true);
+    };
+
+    const handleConfirm = async () => {
+        setShowModal(false);
         setLoading(true);
         try {
-            // basePrice se envía como 0; el precio real lo determinan los asientos generados automáticamente
             await registerFunction({ ...formData, basePrice: "0", image });
             setSuccessMsg("¡Función registrada exitosamente!");
             setFormData({ name: "", description: "", dateFunction: "", timeFunction: "" });
@@ -70,6 +75,15 @@ function RegisterFunction() {
 
     return (
         <div className="dashboard-page">
+
+            {showModal && (
+                <ConfirmModal
+                    mensaje="¿Está seguro de que desea registrar esta función?"
+                    onConfirm={handleConfirm}
+                    onCancel={() => setShowModal(false)}
+                />
+            )}
+
             <div style={{ padding: "20px" }}>
                 <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px", marginBottom: "24px" }}>
                     🎭 Registrar Función
@@ -82,58 +96,56 @@ function RegisterFunction() {
                     <form onSubmit={handleSubmit} noValidate>
                         <div style={{ display: "flex", gap: "30px" }}>
 
-                            {/* Columna izquierda — campos */}
                             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "16px" }}>
 
-                                {/* Nombre */}
                                 <div>
                                     <label style={{ fontWeight: "600", color: "#333", display: "block", marginBottom: "4px" }}>
                                         Nombre de la obra
                                     </label>
                                     <input
                                         name="name" type="text" value={formData.name} onChange={handleChange}
+                                        disabled={loading}
                                         style={{ width: "100%", padding: "8px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.95rem", boxSizing: "border-box" }}
                                     />
                                     {fieldErrors.name && <span style={{ color: "#f56558", fontSize: "0.75rem" }}>{fieldErrors.name}</span>}
                                 </div>
 
-                                {/* Descripción */}
                                 <div>
                                     <label style={{ fontWeight: "600", color: "#333", display: "block", marginBottom: "4px" }}>
                                         Descripción de la obra
                                     </label>
                                     <textarea
                                         name="description" value={formData.description} onChange={handleChange} rows={3}
+                                        disabled={loading}
                                         style={{ width: "100%", padding: "8px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.95rem", boxSizing: "border-box", resize: "vertical" }}
                                     />
                                     {fieldErrors.description && <span style={{ color: "#f56558", fontSize: "0.75rem" }}>{fieldErrors.description}</span>}
                                 </div>
 
-                                {/* Fecha */}
                                 <div>
                                     <label style={{ fontWeight: "600", color: "#333", display: "block", marginBottom: "4px" }}>
                                         Fecha de la función
                                     </label>
                                     <input
                                         name="dateFunction" type="date" value={formData.dateFunction} onChange={handleChange}
+                                        disabled={loading}
                                         style={{ width: "100%", padding: "8px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.95rem", boxSizing: "border-box" }}
                                     />
                                     {fieldErrors.dateFunction && <span style={{ color: "#f56558", fontSize: "0.75rem" }}>{fieldErrors.dateFunction}</span>}
                                 </div>
 
-                                {/* Hora */}
                                 <div>
                                     <label style={{ fontWeight: "600", color: "#333", display: "block", marginBottom: "4px" }}>
                                         Hora de la función (FORMATO 24HR)
                                     </label>
                                     <input
                                         name="timeFunction" type="time" value={formData.timeFunction} onChange={handleChange}
+                                        disabled={loading}
                                         style={{ width: "100%", padding: "8px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.95rem", boxSizing: "border-box" }}
                                     />
                                     {fieldErrors.timeFunction && <span style={{ color: "#f56558", fontSize: "0.75rem" }}>{fieldErrors.timeFunction}</span>}
                                 </div>
 
-                                {/* Nota informativa sobre precios */}
                                 <div style={{
                                     background: "#F5F0E8", border: "1px solid #C0A060",
                                     borderRadius: "6px", padding: "10px 14px", fontSize: "12px", color: "#666"
@@ -143,7 +155,6 @@ function RegisterFunction() {
                                 </div>
                             </div>
 
-                            {/* Columna derecha — imagen */}
                             <div style={{ width: "220px", display: "flex", flexDirection: "column", gap: "8px" }}>
                                 <label style={{ fontWeight: "600", color: "#333" }}>
                                     Imagen de portada <span style={{ fontWeight: "normal", color: "#888" }}>(opcional)</span>
@@ -153,9 +164,9 @@ function RegisterFunction() {
                                         width: "100%", height: "200px", border: "1px solid #ccc",
                                         borderRadius: "4px", display: "flex", alignItems: "center",
                                         justifyContent: "center", overflow: "hidden",
-                                        backgroundColor: "#fafafa", cursor: "pointer"
+                                        backgroundColor: "#fafafa", cursor: loading ? "not-allowed" : "pointer"
                                     }}
-                                    onClick={() => document.getElementById("imageInput")?.click()}
+                                    onClick={() => !loading && document.getElementById("imageInput")?.click()}
                                 >
                                     {imagePreview ? (
                                         <img src={imagePreview} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -168,6 +179,7 @@ function RegisterFunction() {
                                 <input
                                     id="imageInput" type="file" accept="image/*"
                                     onChange={handleImageChange} style={{ display: "none" }}
+                                    disabled={loading}
                                 />
                                 {image && <span style={{ fontSize: "0.75rem", color: "#555" }}>{image.name}</span>}
                             </div>
@@ -178,7 +190,8 @@ function RegisterFunction() {
 
                         <div style={{ marginTop: "24px" }}>
                             <button
-                                type="submit" disabled={loading}
+                                type="submit"
+                                disabled={loading}
                                 style={{
                                     backgroundColor: loading ? "#aaa" : "#8B0000", color: "white",
                                     border: "none", padding: "10px 28px", borderRadius: "4px",
@@ -186,7 +199,7 @@ function RegisterFunction() {
                                     cursor: loading ? "not-allowed" : "pointer"
                                 }}
                             >
-                                {loading ? "Registrando..." : "Registrar Función"}
+                                {loading ? "Registrando función..." : "Registrar Función"}
                             </button>
                         </div>
                     </form>
