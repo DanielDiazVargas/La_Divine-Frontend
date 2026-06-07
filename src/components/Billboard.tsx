@@ -212,8 +212,7 @@ function Billboard() {
                                 )}
                             </div>
 
-                            <div style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "5px", flex: 1 }}>
-                                <h3 style={{ color: "#8B0000", fontSize: "14px", margin: 0 }}>{f.name}</h3>
+                                <div style={{ padding: "14px", display: "flex", flexDirection: "column", gap: "5px", flex: 1, justifyContent: "space-between" }}>                                <h3 style={{ color: "#8B0000", fontSize: "14px", margin: 0 }}>{f.name}</h3>
 
                                 {f.description && (
                                     <p style={{
@@ -230,9 +229,6 @@ function Billboard() {
                                 <p style={{ fontSize: "12px", color: "#777", margin: 0 }}>
                                     📅 {formatDate(f.dateFunction)} &nbsp;🕐 {f.timeFunction}
                                 </p>
-                                <p style={{ fontSize: "13px", fontWeight: "bold", color: "#8B0000", margin: 0 }}>
-                                    {formatPrice(f.basePrice)}
-                                </p>
                                 <p style={{ fontSize: "11px", color: "#888", margin: 0 }}>
                                     💺 {f.availableSeats}/{f.totalSeats} disponibles
                                 </p>
@@ -241,7 +237,7 @@ function Billboard() {
                                     disabled={f.availableSeats === 0}
                                     onClick={() => handleShowDetail(f)}
                                     style={{
-                                        marginTop: "8px", padding: "10px", width: "100%",
+                                        marginTop: "auto", padding: "10px", width: "100%",
                                         border: "none", borderRadius: "4px",
                                         fontWeight: "bold", fontSize: "13px",
                                         cursor: f.availableSeats > 0 ? "pointer" : "not-allowed",

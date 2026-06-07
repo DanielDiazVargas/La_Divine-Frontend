@@ -14,6 +14,7 @@
     border: 1px solid var(--secundario);
     border-radius: 2px;
     background-color: var(--blanco);
+    overflow: hidden;
 }
 
 .register-header {
@@ -26,10 +27,10 @@
 }
 
 .register-body {
-    padding: 30px;
+    padding: 30px 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 5px;
 }
 
 .input-row {
@@ -46,7 +47,6 @@
     line-height: 1.4;
 }
 
-/* BOTONES DE REGISTRO Y RETORNO */
 .btn-registrar {
     background-color: var(--primario);
     color: var(--blanco);
@@ -81,7 +81,6 @@
     color: var(--blanco);
 }
 
-/* Wrapper para campos del input-row (Nombre y Apellido) */
 .input-group-wrapper {
     display: flex;
     flex-direction: column;
@@ -90,14 +89,12 @@
     gap: 3px;
 }
 
-/* Wrapper para campos individuales fuera del input-row */
 .input-field-wrapper {
     display: flex;
     flex-direction: column;
     gap: 3px;
 }
 
-/* Mensaje de error — min-height reserva espacio fijo para evitar saltos en el layout */
 .field-error {
     color: #f56558;
     font-size: 0.72rem;
@@ -110,4 +107,15 @@
     color: #f56558;
     font-size: 0.85rem;
     text-align: center;
+}
+
+/* Sobrescribe input-group e input-field dentro del registro */
+.register-body .input-group {
+    min-width: 0;
+    width: 100%;
+}
+
+.register-body .input-field {
+    min-width: 0;
+    width: 100%;
 }

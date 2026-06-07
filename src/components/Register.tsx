@@ -3,21 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "../styles/register.css";
 import logoUrl from "../assets/icons/LogoLaDivine.svg";
 import { register } from '../services/AuthServices';
+import ConfirmModal from "./ConfirmModal";
 
-/**
- * Componente que gestiona el formulario de registro para nuevos clientes.
- * Captura los datos personales y los envía al backend para la creación de la cuenta.
- */
 function Register() {
   const navigate = useNavigate();
-  
-  // Mensaje de error general proveniente del backend
   const [errorMsg, setErrorMsg] = useState('');
-
-  // Errores de validación por campo individual
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
-  // Almacena los datos introducidos por el usuario en los campos del formulario
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     lastName: '',
@@ -26,10 +19,6 @@ function Register() {
     phone: ''
   });
 
-  /**
-   * Controla la entrada del teléfono, eliminando caracteres no numéricos
-   * y limitando la longitud para cumplir con el formato estándar.
-   */
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = e.target.value.replace(/\D/g, '');
     if (inputValue.length <= 9) {
@@ -37,56 +26,67 @@ function Register() {
     }
   };
 
-  /**
-   * Procesa el envío del formulario, aplicando validaciones estrictas.
-   */
   const handleRegistro = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg("");
 
     const errors: Record<string, string> = {};
-    
-    // Validaciones de campos faltantes
     if (!formData.name.trim())     errors.name     = 'Falta completar el campo Nombre';
     if (!formData.lastName.trim()) errors.lastName = 'Falta completar el campo Apellido';
-    
     if (!formData.email.trim())    errors.email    = 'Falta completar el campo Correo Electrónico';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Ingresa un correo electrónico válido';
-    
     if (!formData.rut.trim())      errors.rut      = 'Falta completar el campo RUT';
-    
     if (!formData.phone.trim())    errors.phone    = 'Falta completar el campo Teléfono de contacto';
     else if (formData.phone.length !== 9) errors.phone = 'El número de teléfono debe tener exactamente 9 dígitos';
 
-    // Si existen errores, detenemos el envío
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
     }
 
     setFieldErrors({});
+    setShowModal(true);
+  };
 
+  const handleConfirm = async () => {
+    setShowModal(false);
+    setLoading(true);
     try {
       await register(formData);
-      navigate("/login", { 
-        state: { mensajeExito: "¡Registro exitoso! Revisa tu correo electrónico para obtener tu contraseña." } 
+      navigate("/login", {
+        state: { mensajeExito: "¡Registro exitoso! Revisa tu correo electrónico para obtener tu contraseña." }
       });
     } catch (error: any) {
       setErrorMsg("Atención: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
+  const errorSpan = (key: string) => (
+    <span style={{ color: '#f56558', fontSize: '0.72rem', display: 'block', minHeight: '1rem', lineHeight: 1.2 }}>
+      {fieldErrors[key] || ""}
+    </span>
+  );
+
   return (
     <div className="register">
+      {showModal && (
+        <ConfirmModal
+          mensaje="¿Está seguro de que desea registrarse con los datos ingresados?"
+          onConfirm={handleConfirm}
+          onCancel={() => setShowModal(false)}
+        />
+      )}
+
       <img src={logoUrl} alt="Logo Teatro La Divine" className="logo" />
       <div className="register-container">
         <div className="register-header">Crear cuenta</div>
 
         <form className="register-body" onSubmit={handleRegistro} noValidate>
 
-          <div style={{ display: 'flex', gap: '12px', width: '100%', alignItems: 'flex-start', overflow: 'visible' }}>
-            
-            {/* Wrapper Nombre */}
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: '3px', overflow: 'visible' }}>
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <div className="input-group">
                 <div className="input-icon">👤</div>
                 <input
@@ -97,16 +97,12 @@ function Register() {
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
                 />
               </div>
-              {fieldErrors.name && (
-                <span style={{ color: '#f56558', fontSize: '0.72rem', display: 'block', minHeight: '0.9rem', lineHeight: 1.2 }}>
-                  {fieldErrors.name}
-                </span>
-              )}
+              {errorSpan('name')}
             </div>
-            
-            {/* Wrapper Apellido */}
-            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0, gap: '3px', overflow: 'visible' }}>
+
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px' }}>
               <div className="input-group">
+                <div className="input-icon">👤</div>
                 <input
                   type="text"
                   className="input-field"
@@ -115,17 +111,11 @@ function Register() {
                   onChange={(e) => setFormData({...formData, lastName: e.target.value})}
                 />
               </div>
-              {fieldErrors.lastName && (
-                <span style={{ color: '#f56558', fontSize: '0.72rem', display: 'block', minHeight: '0.9rem', lineHeight: 1.2 }}>
-                  {fieldErrors.lastName}
-                </span>
-              )}
+              {errorSpan('lastName')}
             </div>
-
           </div>
 
-          {/* Correo Electrónico */}
-          <div className="input-field-wrapper">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             <div className="input-group">
               <div className="input-icon">✉️</div>
               <input
@@ -136,11 +126,10 @@ function Register() {
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
               />
             </div>
-            {fieldErrors.email && <span className="field-error">{fieldErrors.email}</span>}
+            {errorSpan('email')}
           </div>
 
-          {/* RUT */}
-          <div className="input-field-wrapper">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             <div className="input-group">
               <div className="input-icon">🪪</div>
               <input
@@ -152,11 +141,10 @@ function Register() {
                 onChange={(e) => setFormData({...formData, rut: e.target.value})}
               />
             </div>
-            {fieldErrors.rut && <span className="field-error">{fieldErrors.rut}</span>}
+            {errorSpan('rut')}
           </div>
 
-          {/* Teléfono */}
-          <div className="input-field-wrapper">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             <div className="input-group">
               <div className="input-icon">📞</div>
               <input
@@ -167,16 +155,18 @@ function Register() {
                 onChange={handlePhoneChange}
               />
             </div>
-            {fieldErrors.phone && <span className="field-error">{fieldErrors.phone}</span>}
+            {errorSpan('phone')}
           </div>
 
           {errorMsg && <div className="error-banner">{errorMsg}</div>}
 
-          <button type="submit" className="btn-registrar">Registrarse</button>
+          <button type="submit" className="btn-registrar" disabled={loading}>
+            {loading ? "Registrando..." : "Registrarse"}
+          </button>
 
           <div className="login-divider"><span>¿Ya tiene cuenta?</span></div>
 
-          <button type="button" className="btn-volver" onClick={() => navigate("/")}>
+          <button type="button" className="btn-volver" disabled={loading} onClick={() => navigate("/")}>
             Iniciar sesión
           </button>
 
