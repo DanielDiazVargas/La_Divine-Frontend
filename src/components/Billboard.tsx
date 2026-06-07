@@ -24,10 +24,6 @@ function Billboard() {
         return `${day}-${month}-${year}`;
     };
 
-    const formatPrice = (price: number) => {
-        return `$${price.toLocaleString("es-CL")}`;
-    };
-
     const loadBillboard = async (useFilters = false) => {
         setIsSearching(true);
         setMessage("");
