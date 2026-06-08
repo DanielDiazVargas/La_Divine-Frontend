@@ -71,8 +71,11 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
   const [reserveError, setReserveError] = useState("");
   const [reservationResult, setReservationResult] = useState<ReservationData | null>(null);
 
-  // Modal de confirmación
+  // Modal de confirmación de reserva
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  // ── NUEVO: Modal de error por asiento no disponible ────────────────────────
+  const [showSeatErrorModal, setShowSeatErrorModal] = useState(false);
 
   // ── Carga asientos reales del backend ──────────────────────────────────────
   useEffect(() => {
@@ -107,7 +110,8 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
 
       const g = svgEl("g", {
         "data-sn": seatNumber,
-        style: occ ? "cursor:default" : "cursor:pointer",
+        // CAMBIO: cursor not-allowed para asientos ocupados/reservados
+        style: occ ? "cursor:not-allowed" : "cursor:pointer",
         transform: `rotate(${angle},${x},${y})`,
       }, svg);
 
@@ -135,6 +139,11 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
         g.addEventListener("click", () => toggleSeat(seatNumber, zone, r, dto));
         g.addEventListener("mouseenter", () => { if (!selIds.current.has(dto.id)) r.setAttribute("fill", lighten(z.c)); });
         g.addEventListener("mouseleave", () => { if (!selIds.current.has(dto.id)) r.setAttribute("fill", z.c); });
+      }
+
+      // NUEVO: clic en asiento ocupado/reservado → muestra modal de error
+      if (occ) {
+        g.addEventListener("click", () => setShowSeatErrorModal(true));
       }
     }
 
@@ -356,6 +365,57 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
   // ── Vista principal: mapa ──────────────────────────────────────────────────
   return (
     <div className="dashboard-page">
+
+      {/* ── NUEVO: Modal de error — asiento no disponible ──────────────────── */}
+      {showSeatErrorModal && (
+        <div
+          style={{
+            position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000,
+          }}
+          onClick={() => setShowSeatErrorModal(false)}  // cierra al hacer clic fuera
+        >
+          <div
+            style={{
+              background: "white", borderRadius: 10, padding: "32px 28px",
+              maxWidth: 380, width: "90%", textAlign: "center",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.18)",
+            }}
+            onClick={(e) => e.stopPropagation()}  // evita cierre al hacer clic dentro
+          >
+            {/* Ícono de error */}
+            <div style={{
+              width: 52, height: 52, borderRadius: "50%",
+              background: "#f56558", display: "flex",
+              alignItems: "center", justifyContent: "center",
+              margin: "0 auto 16px",
+            }}>
+              <span style={{ color: "#fff", fontSize: 26, fontWeight: 800, lineHeight: 1 }}>!</span>
+            </div>
+
+            {/* Mensaje en color #f56558 según ERS */}
+            <p style={{
+              color: "#f56558", fontWeight: 700, fontSize: 15,
+              margin: "0 0 24px", lineHeight: 1.4,
+            }}>
+              El asiento seleccionado no se encuentra disponible
+            </p>
+
+            <hr style={{ border: "none", borderTop: "1px solid #eee", margin: "0 0 20px" }} />
+
+            <button
+              onClick={() => setShowSeatErrorModal(false)}
+              style={{
+                background: "#8B0000", color: "#fff", border: "none",
+                borderRadius: 6, padding: "10px 32px",
+                fontWeight: 700, fontSize: 13, cursor: "pointer",
+              }}
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Modal de confirmación de reserva */}
       {showConfirmModal && (
