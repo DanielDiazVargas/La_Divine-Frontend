@@ -56,7 +56,8 @@ export interface MyReservationDto {
   seatCount: number;
   seatNumbers: string[];
   totalPrice: number;
-  status: number;    // 0 = Pagada, 1 = Anulada
+  status: number;    // 0 = Activa, 1 = Anulada
+  isPaid: boolean;
   createdAt: string;
 }
 
@@ -114,8 +115,8 @@ export const getMyReservations = async (): Promise<MyReservationDto[]> => {
  * Anula una reserva y libera sus asientos (TAR-002).
  */
 export const cancelReservation = async (code: string): Promise<void> => {
-  const res = await fetch(`${API}/${code}`, {
-    method: "DELETE",
+  const res = await fetch(`${API}/${code}/cancel`, {
+    method: "PATCH",
     headers: headers(),
   });
   const data = await res.json();

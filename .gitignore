@@ -19,6 +19,8 @@ obj/
 
 # Environment y Seguridad
 .env
+ERS_Divine.md
+claude.md
 
 # Vite cache
 .vite/

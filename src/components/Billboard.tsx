@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { getBillboardFunctions, type BillboardFunction } from "../services/BillboardServices";
 import { getRoleFromToken } from "../services/AuthServices";
 import SeatMap from "./SeatMap";
@@ -8,7 +9,16 @@ import SeatMap from "./SeatMap";
  * Incluye filtros por nombre y fecha, cards con imagen y botón de reserva.
  * Reemplaza tanto la vista de inicio como la vista de cartelera por tabla.
  */
+interface ReturnState {
+    returnToSeatMap?: boolean;
+    functionId?: number;
+    functionName?: string;
+}
+
 function Billboard() {
+    const location = useLocation();
+    const returnState = (location.state as ReturnState | null);
+
     const [functions, setFunctions] = useState<BillboardFunction[]>([]);
     const [nameFilter, setNameFilter] = useState("");
     const [dateFilter, setDateFilter] = useState("");
@@ -28,7 +38,7 @@ function Billboard() {
         return `${day}-${month}-${year}`;
     };
 
-    const loadBillboard = async (useFilters = false) => {
+    const loadBillboard = async (useFilters = false): Promise<BillboardFunction[]> => {
         setIsSearching(true);
         setMessage("");
         try {
@@ -43,16 +53,27 @@ function Billboard() {
             if (useFilters && result.length === 0) {
                 setMessage("No se encontraron funciones con los criterios indicados");
             }
+            return result;
         } catch (error: any) {
             setFunctions([]);
             setMessage(error.message || "Error al consultar cartelera.");
+            return [];
         } finally {
             setIsSearching(false);
         }
     };
 
     useEffect(() => {
-        loadBillboard(false);
+        loadBillboard(false).then(result => {
+            // Si viene de la página de pago con volver, abre directamente el SeatMap
+            if (returnState?.returnToSeatMap && returnState.functionId) {
+                const fn = result.find(f => f.id === returnState.functionId);
+                if (fn) {
+                    setSelectedFunction(fn);
+                    setShowSeatMap(true);
+                }
+            }
+        });
     }, []);
 
     const handleSearch = () => loadBillboard(true);
@@ -81,11 +102,10 @@ function Billboard() {
     };
 
     /**
-     * Vuelve a la cartelera desde el mapa de asientos.
+     * Vuelve al detalle de la función desde el mapa de asientos.
      */
     const handleBackFromSeatMap = () => {
         setShowSeatMap(false);
-        setSelectedFunction(null);
     };
 
     // ── Vista: Mapa de asientos ──────────────────────────────────────────────
@@ -168,13 +188,13 @@ function Billboard() {
                             className="billboard-reserve-main"
                             onClick={handleReserveClick}
                         >
-                            Reservar
+                            Reservar asientos
                         </button>
                         <button
                             className="billboard-back-button"
                             onClick={() => setSelectedFunction(null)}
                         >
-                            Volver a cartelera
+                            Volver a la cartelera
                         </button>
                     </div>
                 </div>
@@ -275,14 +295,7 @@ function Billboard() {
                                 <button
                                     disabled={f.availableSeats === 0}
                                     onClick={() => handleShowDetail(f)}
-                                    style={{
-                                        marginTop: "auto", padding: "10px", width: "100%",
-                                        border: "none", borderRadius: "4px",
-                                        fontWeight: "bold", fontSize: "13px",
-                                        cursor: f.availableSeats > 0 ? "pointer" : "not-allowed",
-                                        backgroundColor: f.availableSeats > 0 ? "#00a650" : "#f56558",
-                                        color: "white"
-                                    }}
+                                    className={`billboard-card-btn ${f.availableSeats > 0 ? "disponible" : "no-disponible"}`}
                                 >
                                     {f.availableSeats > 0 ? "Reservar" : "No disponible"}
                                 </button>

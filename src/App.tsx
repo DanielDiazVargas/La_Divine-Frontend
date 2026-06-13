@@ -2,7 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
-import ProtectedRoute from "./components/ProtectedRoute"; 
+import PaymentPage from "./components/PaymentPage";
+import PaymentSuccessPage from "./components/PaymentSuccessPage";
+import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute.tsx";
 
 /**
@@ -24,6 +26,8 @@ function App() {
         {/* Rutas protegidas mediante validación de credenciales */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -10,7 +10,8 @@ interface Reservation {
     seatCount: number;
     seatNumbers: string[];
     totalPrice: number;
-    status: number; // 0 = Pagada, 1 = Anulada
+    status: number; // 0 = Activa, 1 = Anulada
+    isPaid: boolean;
     createdAt: string;
 }
 
@@ -93,12 +94,12 @@ function MyReservations() {
                                                 <span style={{
                                                     padding: "4px 12px",
                                                     borderRadius: "12px",
-                                                    backgroundColor: r.status === 0 ? "#4CAF50" : "#D64045",
+                                                    backgroundColor: r.isPaid ? "#4CAF50" : "#D64045",
                                                     color: "#fff",
                                                     fontWeight: "bold",
                                                     fontSize: "0.85em"
                                                 }}>
-                                                    {r.status === 0 ? "Pagada" : "Anulada"}
+                                                    {r.isPaid ? "Pagada" : "Anulada"}
                                                 </span>
                                             </td>
                                         </tr>
