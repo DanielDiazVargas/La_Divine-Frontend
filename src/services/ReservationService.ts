@@ -122,3 +122,28 @@ export const cancelReservation = async (code: string): Promise<void> => {
   const data = await res.json();
   if (!res.ok || !data.success) throw new Error(data.message || "Error al anular la reserva.");
 };
+
+/**
+ * GET /api/reservation/{code}/pdf
+ * Descarga la entrada en PDF de una reserva pagada (FUN-005).
+ */
+export const downloadReservationPdf = async (code: string): Promise<void> => {
+  const res = await fetch(`${API}/${code}/pdf`, { headers: headers() });
+
+  if (!res.ok) {
+    // El backend devuelve JSON con el mensaje de error cuando falla
+    const data = await res.json().catch(() => null);
+    throw new Error(data?.message || "No se pudo descargar la entrada.");
+  }
+
+  // Convierte la respuesta en un archivo descargable
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `entrada_${code}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
