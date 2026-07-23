@@ -5,6 +5,7 @@ import UserManagement from "./UserManagement";
 import RegisterFunction from "./RegisterFunction";
 import Billboard from "./Billboard";
 import MyReservations from "./MyReservations";
+import CancelReservation from "./CancelReservation";
 
 import { getRoleFromToken } from "../services/AuthServices";
 import "../styles/dashboard.css";
@@ -87,6 +88,15 @@ function Dashboard() {
                                 Registrar función
                             </li>
                         )}
+
+                        {role === "User" && (
+                            <li
+                                className={isActive("/dashboard/anular-reserva")}
+                                onClick={() => navigate("/dashboard/anular-reserva")}
+                            >
+                                Anular Reserva
+                            </li>
+                        )}
                     </ul>
                 </aside>
 
@@ -115,6 +125,13 @@ function Dashboard() {
                             <Route
                                 path="/Registrar-funcion"
                                 element={<RegisterFunction />}
+                            />
+                        )}
+
+                        {role === "User" && (
+                            <Route
+                                path="/anular-reserva"
+                                element={<CancelReservation />}
                             />
                         )}
                     </Routes>
