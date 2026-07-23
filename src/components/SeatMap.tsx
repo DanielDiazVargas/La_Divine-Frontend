@@ -5,6 +5,7 @@ import {
   createReservation,
   type SeatDto,
 } from "../services/ReservationService";
+import InfoTooltip from "./InfoTooltip";
 
 // ─── Mapa de sección → zona SVG ──────────────────────────────────────────────
 
@@ -417,6 +418,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
         </button>
         <h2 style={{ color: "#8B0000", margin: 0 }}>
           {functionName} — Selección de asientos
+          <InfoTooltip text="Haz clic en los asientos de color para seleccionarlos (puedes elegir varios). Los asientos grises ya están ocupados o reservados. Cuando termines, presiona 'Reservar' para confirmar tu compra." />
         </h2>
       </div>
 

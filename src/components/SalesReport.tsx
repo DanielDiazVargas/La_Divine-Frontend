@@ -3,6 +3,7 @@ import {
     getSalesReport,
     type SalesReport
 } from "../services/ReportServices";
+import InfoTooltip from "./InfoTooltip";
 
 /**
  * Componente que permite al administrador visualizar el reporte de ventas.
@@ -83,7 +84,10 @@ function SalesReportComponent() {
     return (
         <div className="dashboard-page">
             <div className="sales-report-card">
-                <h2>Reporte de ventas</h2>
+                <h2>
+                    Reporte de ventas
+                    <InfoTooltip text="Elige una fecha de inicio y una de término, luego presiona 'Generar reporte' para ver cuántas entradas se vendieron, cuánto dinero se recaudó y qué tan llenas estuvieron las funciones en ese período." />
+                </h2>
 
                 <p className="sales-report-description">
                     El reporte considera las funciones dentro del rango de fechas seleccionado.
@@ -97,6 +101,7 @@ function SalesReportComponent() {
                             value={startDate}
                             onChange={(event) => setStartDate(event.target.value)}
                         />
+                        <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
                     </div>
 
                     <div className="sales-report-field">
@@ -106,6 +111,7 @@ function SalesReportComponent() {
                             value={endDate}
                             onChange={(event) => setEndDate(event.target.value)}
                         />
+                        <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
                     </div>
 
                     <button

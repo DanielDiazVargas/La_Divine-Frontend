@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { changePassword } from "../services/AuthServices";
 import ConfirmModal from "./ConfirmModal";
+import InfoTooltip from "./InfoTooltip";
 
 function ChangePasswordUser() {
     const [currentPassword, setCurrentPassword] = useState("");
@@ -62,6 +63,7 @@ function ChangePasswordUser() {
             <div style={{ padding: "20px" }}>
                 <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px", marginBottom: "24px" }}>
                     🔑 Cambiar Contraseña
+                    <InfoTooltip text="Ingresa tu contraseña actual y luego la nueva (mínimo 8 caracteres), repitiéndola para confirmarla." />
                 </h2>
 
                 <div style={{

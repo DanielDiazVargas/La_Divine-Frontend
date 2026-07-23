@@ -18,3 +18,73 @@ body {
     text-align: left;
     border: none;
 }
+
+/* TOOLTIPS DE AYUDA (uso global: dashboard y pantallas públicas) */
+.info-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background-color: #C0A060;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: help;
+    vertical-align: middle;
+}
+
+.info-tooltip-icon {
+    pointer-events: none;
+}
+
+.info-tooltip-text {
+    background-color: #F5F0E8;
+    border: 1px solid #C0A060;
+    color: #5a3d1a;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.4;
+    width: 240px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* Variante renderizada en un portal (document.body), posicionada en JS con
+   coordenadas de viewport, para que nunca quede recortada por el overflow
+   del contenedor donde vive el ícono y siempre se sobreponga a lo que esté encima. */
+.info-tooltip-text-portal {
+    position: fixed;
+    transform: translateY(-50%);
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.info-tooltip-text-portal::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: transparent #C0A060 transparent transparent;
+}
+
+.info-tooltip-text-portal::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-right: -1px;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent #F5F0E8 transparent transparent;
+    z-index: 1;
+}

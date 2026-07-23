@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { registerFunction } from "../services/FunctionServices.ts";
 import ConfirmModal from "./ConfirmModal";
+import InfoTooltip from "./InfoTooltip";
 
 function RegisterFunction() {
     const [formData, setFormData] = useState({
@@ -87,6 +88,7 @@ function RegisterFunction() {
             <div style={{ padding: "20px" }}>
                 <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px", marginBottom: "24px" }}>
                     🎭 Registrar Función
+                    <InfoTooltip text="Aquí creas una nueva función para que aparezca en la cartelera. Completa el nombre, la descripción, la fecha y la hora de la presentación. Los precios de las entradas se calculan solos según la sección del asiento, y no se puede registrar más de una función para el mismo día." />
                 </h2>
 
                 <div style={{
@@ -131,6 +133,7 @@ function RegisterFunction() {
                                         disabled={loading}
                                         style={{ width: "100%", padding: "8px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.95rem", boxSizing: "border-box" }}
                                     />
+                                    <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
                                     {fieldErrors.dateFunction && <span style={{ color: "#f56558", fontSize: "0.75rem" }}>{fieldErrors.dateFunction}</span>}
                                 </div>
 

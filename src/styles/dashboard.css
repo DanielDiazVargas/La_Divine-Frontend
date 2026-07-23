@@ -783,3 +783,14 @@
 .sales-occupancy-percentage small {
     color: #555555;
 }
+
+.date-filter-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.date-filter-hint {
+    font-size: 11px;
+    color: #888888;
+}

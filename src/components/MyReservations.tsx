@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMyReservations, downloadReservationPdf } from "../services/ReservationService";
 import { getProfile } from "../services/AuthServices";
+import InfoTooltip from "./InfoTooltip";
 
 interface Reservation {
     reservationCode: string;
@@ -71,6 +72,7 @@ function MyReservations() {
             <div style={{ padding: "20px" }}>
                 <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px", marginBottom: "24px" }}>
                     Consultar Reserva
+                    <InfoTooltip text="Aquí ves todas tus reservas, pagadas y anuladas. Si tu reserva está pagada, puedes descargar tu entrada en PDF haciendo clic en 'Descargar'." />
                 </h2>
 
                 <div style={{ background: "#fff", borderRadius: 8, border: "1px solid #C0A060", padding: "20px" }}>

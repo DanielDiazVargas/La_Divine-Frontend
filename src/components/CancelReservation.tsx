@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cancelAndRefund } from "../services/PaymentServices";
+import InfoTooltip from "./InfoTooltip";
 
 function CancelReservation() {
     const [reservationCode, setReservationCode] = useState("");
@@ -56,6 +57,7 @@ function CancelReservation() {
                 marginBottom: "24px"
             }}>
                 🎫 Anular Reserva
+                <InfoTooltip text="Ingresa el código de la reserva que quieres anular y explica el motivo. Esto libera los asientos y procesa el reembolso al cliente automáticamente." />
             </h2>
 
             <div className="form-card">

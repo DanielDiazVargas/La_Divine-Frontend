@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getUsers, toggleUserStatus } from "../services/AuthServices";
 import ConfirmModal from "./ConfirmModal";
+import InfoTooltip from "./InfoTooltip";
 
 interface User {
     id: number;
@@ -103,6 +104,7 @@ function UserManagement() {
             <div style={{ padding: "20px" }}>
                 <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px", marginBottom: "24px" }}>
                     📋 Gestionar Usuarios
+                    <InfoTooltip text="Aquí ves a todos los usuarios registrados. Puedes buscarlos por correo y activar o desactivar su cuenta; un usuario desactivado no podrá iniciar sesión." />
                 </h2>
 
                 <div style={{ background: "#fff", borderRadius: 8, border: "1px solid #C0A060", padding: "20px" }}>

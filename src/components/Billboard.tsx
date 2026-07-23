@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { getBillboardFunctions, type BillboardFunction } from "../services/BillboardServices";
 import { getRoleFromToken } from "../services/AuthServices";
 import SeatMap from "./SeatMap";
+import InfoTooltip from "./InfoTooltip";
 
 /**
  * Componente unificado que muestra las funciones vigentes de la cartelera.
@@ -208,6 +209,7 @@ function Billboard() {
             <div style={{ padding: "20px" }}>
             <h2 style={{ color: "#8B0000", borderBottom: "2px solid #8B0000", paddingBottom: "10px", marginBottom: "24px" }}>
                 Cartelera
+                <InfoTooltip text="Busca una función escribiendo su nombre, eligiendo una fecha, o ambos a la vez. Si dejas los dos campos vacíos y presionas 'Buscar', se muestran todas las funciones disponibles." />
             </h2>
 
             <div className="billboard-filters">
@@ -217,11 +219,14 @@ function Billboard() {
                     value={nameFilter}
                     onChange={e => setNameFilter(e.target.value)}
                 />
-                <input
-                    type="date"
-                    value={dateFilter}
-                    onChange={e => setDateFilter(e.target.value)}
-                />
+                <div className="date-filter-wrapper">
+                    <input
+                        type="date"
+                        value={dateFilter}
+                        onChange={e => setDateFilter(e.target.value)}
+                    />
+                    <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
+                </div>
                 <button
                     className="billboard-search-button"
                     onClick={handleSearch}

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { processPayment, type PaymentRequest } from "../services/PaymentServices";
 import { cancelReservation, type ReservationSeatDto } from "../services/ReservationService";
 import ConfirmModal from "./ConfirmModal";
+import InfoTooltip from "./InfoTooltip";
 import "../styles/login.css";
 
 const TIMEOUT_SECONDS = 10 * 60; // 10 minutos para completar el pago
@@ -232,7 +233,10 @@ export default function PaymentPage() {
         <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1 }}>
           <span style={{ fontSize: 24 }}>💳</span>
           <div>
-            <h2 style={{ margin: 0, color: "#8B0000", fontSize: "1.8rem" }}>Pago seguro</h2>
+            <h2 style={{ margin: 0, color: "#8B0000", fontSize: "1.8rem" }}>
+              Pago seguro
+              <InfoTooltip text="Completa los datos de tu tarjeta para confirmar la compra. Tienes 10 minutos: si el tiempo se agota antes de pagar, la reserva se cancela y los asientos vuelven a estar disponibles para otras personas." />
+            </h2>
             <p style={{ margin: 0, color: "#888", fontSize: 15 }}>Teatro La Divine</p>
           </div>
         </div>
@@ -324,7 +328,10 @@ export default function PaymentPage() {
 
             <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
-                <label style={labelStyle}>CVV</label>
+                <label style={labelStyle}>
+                  CVV
+                  <InfoTooltip text="Son los 3 números que están al reverso de tu tarjeta, junto a la firma." />
+                </label>
                 <input
                   type="text"
                   maxLength={3}

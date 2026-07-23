@@ -4,6 +4,7 @@ import "../styles/register.css";
 import logoUrl from "../assets/icons/LogoLaDivine.svg";
 import { register } from '../services/AuthServices';
 import ConfirmModal from "./ConfirmModal";
+import InfoTooltip from "./InfoTooltip";
 
 function Register() {
   const navigate = useNavigate();
@@ -140,6 +141,7 @@ function Register() {
                 value={formData.rut}
                 onChange={(e) => setFormData({...formData, rut: e.target.value})}
               />
+              <InfoTooltip text="Ingresa tu RUT sin puntos ni guión, terminando en el dígito verificador (puede ser un número o la letra K)." />
             </div>
             {errorSpan('rut')}
           </div>
