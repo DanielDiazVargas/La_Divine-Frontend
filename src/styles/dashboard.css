@@ -565,3 +565,221 @@
     background-color: #8B0000;
     color: #ffffff;
 }
+
+/* REPORTE DE VENTAS */
+
+.sales-report-card {
+    background: #ffffff;
+    border: 1px solid #C0A060;
+    border-radius: 8px;
+    padding: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.sales-report-card h2 {
+    color: #8B0000;
+    font-size: 28px;
+    border-bottom: 2px solid #8B0000;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.sales-report-description {
+    color: #555555;
+    margin-bottom: 22px;
+}
+
+.sales-report-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.sales-report-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sales-report-field label {
+    color: #8B0000;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.sales-report-field input {
+    padding: 10px 12px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.sales-report-button {
+    background-color: #8B0000;
+    color: #ffffff;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.sales-report-button:hover:not(:disabled) {
+    background-color: #6a0000;
+}
+
+.sales-report-button:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.sales-report-error {
+    color: #f56558;
+    font-weight: bold;
+    margin-top: 12px;
+}
+
+.sales-report-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+    margin-bottom: 28px;
+}
+
+.sales-summary-box {
+    background-color: #F5F0E8;
+    border: 1px solid #C0A060;
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sales-summary-box span {
+    color: #555555;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.sales-summary-box strong {
+    color: #8B0000;
+    font-size: 24px;
+}
+
+.sales-report-section {
+    margin-top: 28px;
+}
+
+.sales-report-section h3 {
+    color: #8B0000;
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+.sales-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #C0A060;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.sales-report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.sales-report-table thead {
+    background-color: #8B0000;
+    color: #ffffff;
+}
+
+.sales-report-table th,
+.sales-report-table td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.sales-report-table tbody tr:hover {
+    background-color: #F5F0E8;
+}
+
+.sales-status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.sales-status.paid {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.sales-status.pending {
+    background-color: #fff3cd;
+    color: #8a6d3b;
+}
+
+.sales-occupancy-card {
+    border: 1px solid #C0A060;
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 18px;
+    background-color: #ffffff;
+}
+
+.sales-occupancy-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.sales-occupancy-header h4 {
+    color: #8B0000;
+    margin: 0 0 6px 0;
+    font-size: 18px;
+}
+
+.sales-occupancy-header p {
+    margin: 0;
+    color: #555555;
+}
+
+.sales-occupancy-percentage {
+    background-color: #F5F0E8;
+    border: 1px solid #C0A060;
+    border-radius: 8px;
+    padding: 12px 16px;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sales-occupancy-percentage span {
+    color: #555555;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.sales-occupancy-percentage strong {
+    color: #8B0000;
+    font-size: 24px;
+}
+
+.sales-occupancy-percentage small {
+    color: #555555;
+}

@@ -6,6 +6,7 @@ import RegisterFunction from "./RegisterFunction";
 import Billboard from "./Billboard";
 import MyReservations from "./MyReservations";
 import CancelReservation from "./CancelReservation";
+import SalesReport from "./SalesReport";
 
 import { getRoleFromToken } from "../services/AuthServices";
 import "../styles/dashboard.css";
@@ -97,6 +98,15 @@ function Dashboard() {
                                 Anular Reserva
                             </li>
                         )}
+                        {/* REP-001: Reporte de ventas — solo para administradores */}
+                        {role === "Admin" && (
+                            <li
+                                className={isActive("/dashboard/reporte-ventas")}
+                                onClick={() => navigate("/dashboard/reporte-ventas")}
+                            >
+                                Reporte de ventas
+                            </li>
+                        )}
                     </ul>
                 </aside>
 
@@ -132,6 +142,13 @@ function Dashboard() {
                             <Route
                                 path="/anular-reserva"
                                 element={<CancelReservation />}
+                            />
+                        )}
+                        {/* REP-001: visualización del reporte de ventas */}
+                        {role === "Admin" && (
+                            <Route
+                                path="/reporte-ventas"
+                                element={<SalesReport />}
                             />
                         )}
                     </Routes>
