@@ -8,11 +8,18 @@ interface DatePickerProps {
     disabled?: boolean;
 }
 
+type CalendarView = "days" | "months" | "years";
+
 const WEEKDAYS = ["L", "M", "M", "J", "V", "S", "D"];
 const MONTHS = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
+const MONTHS_SHORT = [
+    "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+    "Jul", "Ago", "Sep", "Oct", "Nov", "Dic",
+];
+const YEARS_PER_PAGE = 12;
 
 function pad(n: number) {
     return String(n).padStart(2, "0");
@@ -34,16 +41,23 @@ function formatDisplay(value: string): string {
  * Selector de fecha propio (texto dd/mm/aaaa + calendario desplegable), para no
  * depender del formato nativo del <input type="date"> del navegador, que varía
  * según la configuración regional de cada equipo.
+ *
+ * Además de navegar mes a mes, permite saltar directo a un mes o a un año
+ * tocando el nombre del mes o el año en el encabezado.
  */
 function DatePicker({ value, onChange, disabled }: DatePickerProps) {
     const [open, setOpen] = useState(false);
     const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
+    const [view, setView] = useState<CalendarView>("days");
     const containerRef = useRef<HTMLDivElement>(null);
 
     const parsed = parseValue(value);
     const today = new Date();
     const [viewYear, setViewYear] = useState(parsed?.year ?? today.getFullYear());
     const [viewMonth, setViewMonth] = useState(parsed?.month ?? today.getMonth());
+    const [yearRangeStart, setYearRangeStart] = useState(
+        () => (parsed?.year ?? today.getFullYear()) - Math.floor(YEARS_PER_PAGE / 2)
+    );
 
     useEffect(() => {
         if (!open) return;
@@ -60,8 +74,11 @@ function DatePicker({ value, onChange, disabled }: DatePickerProps) {
     const toggleOpen = () => {
         if (disabled) return;
         if (!open) {
-            setViewYear(parsed?.year ?? today.getFullYear());
+            const y = parsed?.year ?? today.getFullYear();
+            setViewYear(y);
             setViewMonth(parsed?.month ?? today.getMonth());
+            setYearRangeStart(y - Math.floor(YEARS_PER_PAGE / 2));
+            setView("days");
             const rect = containerRef.current?.getBoundingClientRect();
             if (rect) setPosition({ top: rect.bottom + 4, left: rect.left });
         }
@@ -71,6 +88,16 @@ function DatePicker({ value, onChange, disabled }: DatePickerProps) {
     const selectDay = (day: number) => {
         onChange(`${viewYear}-${pad(viewMonth + 1)}-${pad(day)}`);
         setOpen(false);
+    };
+
+    const selectMonth = (month: number) => {
+        setViewMonth(month);
+        setView("days");
+    };
+
+    const selectYear = (year: number) => {
+        setViewYear(year);
+        setView("days");
     };
 
     const goPrevMonth = () => {
@@ -92,6 +119,8 @@ function DatePicker({ value, onChange, disabled }: DatePickerProps) {
         ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
     ];
 
+    const yearOptions = Array.from({ length: YEARS_PER_PAGE }, (_, i) => yearRangeStart + i);
+
     return (
         <div className="date-picker" ref={containerRef}>
             <button
@@ -108,29 +137,101 @@ function DatePicker({ value, onChange, disabled }: DatePickerProps) {
 
             {open && position && createPortal(
                 <div className="date-picker-calendar" style={{ top: position.top, left: position.left }}>
-                    <div className="date-picker-header">
-                        <button type="button" onClick={goPrevMonth} aria-label="Mes anterior">‹</button>
-                        <span>{MONTHS[viewMonth]} {viewYear}</span>
-                        <button type="button" onClick={goNextMonth} aria-label="Mes siguiente">›</button>
-                    </div>
-                    <div className="date-picker-weekdays">
-                        {WEEKDAYS.map((w, i) => <span key={i}>{w}</span>)}
-                    </div>
-                    <div className="date-picker-days">
-                        {cells.map((day, i) => {
-                            const isSelected = !!(parsed && parsed.year === viewYear && parsed.month === viewMonth && parsed.day === day);
-                            return day ? (
+
+                    {view === "days" && (
+                        <>
+                            <div className="date-picker-header">
+                                <button type="button" onClick={goPrevMonth} aria-label="Mes anterior">‹</button>
+                                <span className="date-picker-header-title">
+                                    <button type="button" className="date-picker-header-link" onClick={() => setView("months")}>
+                                        {MONTHS[viewMonth]}
+                                    </button>
+                                    <button type="button" className="date-picker-header-link" onClick={() => setView("years")}>
+                                        {viewYear}
+                                    </button>
+                                </span>
+                                <button type="button" onClick={goNextMonth} aria-label="Mes siguiente">›</button>
+                            </div>
+                            <div className="date-picker-weekdays">
+                                {WEEKDAYS.map((w, i) => <span key={i}>{w}</span>)}
+                            </div>
+                            <div className="date-picker-days">
+                                {cells.map((day, i) => {
+                                    const isSelected = !!(parsed && parsed.year === viewYear && parsed.month === viewMonth && parsed.day === day);
+                                    return day ? (
+                                        <button
+                                            type="button"
+                                            key={i}
+                                            className={`date-picker-day${isSelected ? " selected" : ""}`}
+                                            onClick={() => selectDay(day)}
+                                        >
+                                            {day}
+                                        </button>
+                                    ) : <span key={i} />;
+                                })}
+                            </div>
+                        </>
+                    )}
+
+                    {view === "months" && (
+                        <>
+                            <div className="date-picker-header">
+                                <button type="button" onClick={() => setViewYear(viewYear - 1)} aria-label="Año anterior">‹</button>
+                                <button type="button" className="date-picker-header-link" onClick={() => setView("years")}>
+                                    {viewYear}
+                                </button>
+                                <button type="button" onClick={() => setViewYear(viewYear + 1)} aria-label="Año siguiente">›</button>
+                            </div>
+                            <div className="date-picker-grid">
+                                {MONTHS_SHORT.map((m, i) => (
+                                    <button
+                                        type="button"
+                                        key={m}
+                                        className={`date-picker-grid-item${i === viewMonth ? " selected" : ""}`}
+                                        onClick={() => selectMonth(i)}
+                                    >
+                                        {m}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    )}
+
+                    {view === "years" && (
+                        <>
+                            <div className="date-picker-header">
                                 <button
                                     type="button"
-                                    key={i}
-                                    className={`date-picker-day${isSelected ? " selected" : ""}`}
-                                    onClick={() => selectDay(day)}
+                                    onClick={() => setYearRangeStart(yearRangeStart - YEARS_PER_PAGE)}
+                                    aria-label="Años anteriores"
                                 >
-                                    {day}
+                                    ‹
                                 </button>
-                            ) : <span key={i} />;
-                        })}
-                    </div>
+                                <span className="date-picker-header-title">
+                                    {yearRangeStart} - {yearRangeStart + YEARS_PER_PAGE - 1}
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={() => setYearRangeStart(yearRangeStart + YEARS_PER_PAGE)}
+                                    aria-label="Años siguientes"
+                                >
+                                    ›
+                                </button>
+                            </div>
+                            <div className="date-picker-grid">
+                                {yearOptions.map((y) => (
+                                    <button
+                                        type="button"
+                                        key={y}
+                                        className={`date-picker-grid-item${y === viewYear ? " selected" : ""}`}
+                                        onClick={() => selectYear(y)}
+                                    >
+                                        {y}
+                                    </button>
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>,
                 document.body
             )}

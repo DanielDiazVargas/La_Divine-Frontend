@@ -138,9 +138,9 @@ body {
 }
 
 .date-picker-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    justify-content: space-between;
     margin-bottom: 8px;
     font-weight: bold;
     color: #8B0000;
@@ -160,6 +160,23 @@ body {
 
 .date-picker-header button:hover {
     background: #F5F0E8;
+}
+
+.date-picker-header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.date-picker-header-link {
+    font-size: 13px !important;
+    font-weight: bold;
+    padding: 2px 2px !important;
+}
+
+.date-picker-header-link:hover {
+    text-decoration: underline;
 }
 
 .date-picker-weekdays {
@@ -193,6 +210,33 @@ body {
 }
 
 .date-picker-day.selected {
+    background: #8B0000;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.date-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+}
+
+.date-picker-grid-item {
+    background: none;
+    border: 1px solid transparent;
+    padding: 10px 4px;
+    font-size: 13px;
+    color: #333333;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.date-picker-grid-item:hover {
+    background: #F5F0E8;
+    border-color: #C0A060;
+}
+
+.date-picker-grid-item.selected {
     background: #8B0000;
     color: #ffffff;
     font-weight: bold;
