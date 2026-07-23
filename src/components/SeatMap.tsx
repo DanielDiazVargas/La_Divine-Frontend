@@ -4,7 +4,6 @@ import {
   getFunctionSeats,
   createReservation,
   type SeatDto,
-  type ReservationData,
 } from "../services/ReservationService";
 
 // ─── Mapa de sección → zona SVG ──────────────────────────────────────────────
@@ -71,7 +70,6 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
   // Reserva
   const [confirming, setConfirming] = useState(false);
   const [reserveError, setReserveError] = useState("");
-  const [reservationResult, setReservationResult] = useState<ReservationData | null>(null);
 
   // Modal de confirmación de reserva
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -294,83 +292,6 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
     return (
       <div className="dashboard-page" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
         <p style={{ color: "#888", fontSize: 14 }}>Cargando mapa de asientos...</p>
-      </div>
-    );
-  }
-
-  // ── Pantalla: reserva confirmada ───────────────────────────────────────────
-  if (reservationResult) {
-    return (
-      <div className="dashboard-page">
-        <div style={{
-          maxWidth: 560, margin: "40px auto",
-          background: "#fff", border: "1px solid #C0A060",
-          borderRadius: 10, padding: "36px 32px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.08)"
-        }}>
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 44, marginBottom: 10 }}>🎭</div>
-            <h2 style={{ color: "#8B0000", margin: 0 }}>¡Reserva confirmada!</h2>
-            <p style={{ color: "#666", marginTop: 6, fontSize: 13 }}>
-              Guarda tu código, lo necesitarás para mostrar en taquilla.
-            </p>
-          </div>
-
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 12, color: "#999", marginBottom: 4, letterSpacing: 1 }}>CÓDIGO DE RESERVA</div>
-            <div style={{
-              display: "inline-block", fontSize: 22, fontWeight: 800,
-              letterSpacing: 5, color: "#8B0000",
-              background: "#F5F0E8", borderRadius: 6,
-              padding: "10px 28px", border: "1px dashed #C0A060"
-            }}>
-              {reservationResult.reservationCode}
-            </div>
-          </div>
-
-          <div style={{ background: "#fafafa", borderRadius: 8, border: "1px solid #eee", padding: "16px 20px", marginBottom: 20 }}>
-            <div style={{ fontSize: 12, color: "#999", fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>RESUMEN</div>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-              <thead>
-                <tr style={{ borderBottom: "1px solid #eee" }}>
-                  <th style={{ textAlign: "left", padding: "4px 0", color: "#555", fontWeight: 600 }}>Asiento</th>
-                  <th style={{ textAlign: "left", padding: "4px 0", color: "#555", fontWeight: 600 }}>Sección</th>
-                  <th style={{ textAlign: "right", padding: "4px 0", color: "#555", fontWeight: 600 }}>Precio</th>
-                </tr>
-              </thead>
-              <tbody>
-                {reservationResult.selectedSeats.map((s) => (
-                  <tr key={s.id} style={{ borderBottom: "1px solid #f5f5f5" }}>
-                    <td style={{ padding: "5px 0", fontWeight: 700 }}>{s.seatNumber}</td>
-                    <td style={{ padding: "5px 0", color: "#666" }}>{s.section}</td>
-                    <td style={{ padding: "5px 0", textAlign: "right" }}>${s.price.toLocaleString("es-CL")}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan={2} style={{ paddingTop: 10, fontWeight: 700, color: "#333" }}>Total</td>
-                  <td style={{ paddingTop: 10, textAlign: "right", fontWeight: 800, fontSize: 15, color: "#8B0000" }}>
-                    ${reservationResult.totalPrice.toLocaleString("es-CL")}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-
-          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <button
-              onClick={onBack}
-              style={{
-                background: "#8B0000", color: "#fff", border: "none",
-                borderRadius: 6, padding: "10px 24px",
-                fontWeight: 700, fontSize: 13, cursor: "pointer"
-              }}
-            >
-              Volver a cartelera
-            </button>
-          </div>
-        </div>
       </div>
     );
   }
