@@ -94,7 +94,7 @@ function MyReservations() {
                                             <td style={{ padding: "12px" }}>{clientName}</td>
                                             <td style={{ padding: "12px" }}>{r.functionTitle}</td>
                                             <td style={{ padding: "12px" }}>
-                                                {new Date(r.functionDate).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                                                {new Date(r.functionDate).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/-/g, "/")}
                                             </td>
                                             <td style={{ padding: "12px" }}>{r.functionTime}</td>
                                             <td style={{ padding: "12px", fontSize: "0.85rem", color: "#444" }}>
