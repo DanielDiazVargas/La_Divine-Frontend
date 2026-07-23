@@ -35,7 +35,7 @@ function Billboard() {
     const formatDate = (date: string) => {
         const [year, month, day] = date.split("-");
         if (!year || !month || !day) return date;
-        return `${day}-${month}-${year}`;
+        return `${day}/${month}/${year}`;
     };
 
     const loadBillboard = async (useFilters = false): Promise<BillboardFunction[]> => {
@@ -188,7 +188,7 @@ function Billboard() {
                             className="billboard-reserve-main"
                             onClick={handleReserveClick}
                         >
-                            Reservar asientos
+                            Ver asientos
                         </button>
                         <button
                             className="billboard-back-button"

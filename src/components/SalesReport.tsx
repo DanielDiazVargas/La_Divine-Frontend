@@ -26,13 +26,13 @@ function SalesReportComponent() {
     };
 
     /**
-     * Convierte una fecha en formato yyyy-MM-dd a dd-MM-yyyy.
+     * Convierte una fecha en formato yyyy-MM-dd a dd/MM/yyyy.
      */
     const formatDate = (date: string) => {
         const [year, month, day] = date.split("-");
         if (!year || !month || !day) return date;
 
-        return `${day}-${month}-${year}`;
+        return `${day}/${month}/${year}`;
     };
 
     /**

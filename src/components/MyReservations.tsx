@@ -20,6 +20,17 @@ interface Reservation {
  * Cumple Req FUN-004: lista en tabla las reservas del usuario autenticado,
  * ordenadas de la más antigua a la más reciente.
  */
+/**
+ * Convierte una fecha en formato yyyy-MM-dd (o yyyy-MM-ddTHH:mm:ss) a dd/MM/yyyy
+ * sin pasar por Date/toLocaleDateString, evitando el corrimiento de un día
+ * que ocurre al interpretar una fecha sin hora como UTC y mostrarla en horario local.
+ */
+const formatDate = (date: string) => {
+    const [year, month, day] = date.split("T")[0].split("-");
+    if (!year || !month || !day) return date;
+    return `${day}/${month}/${year}`;
+};
+
 function MyReservations() {
     const [reservations, setReservations] = useState<Reservation[]>([]);
     const [clientName, setClientName] = useState("");
@@ -94,7 +105,7 @@ function MyReservations() {
                                             <td style={{ padding: "12px" }}>{clientName}</td>
                                             <td style={{ padding: "12px" }}>{r.functionTitle}</td>
                                             <td style={{ padding: "12px" }}>
-                                                {new Date(r.functionDate).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/-/g, "/")}
+                                                {formatDate(r.functionDate)}
                                             </td>
                                             <td style={{ padding: "12px" }}>{r.functionTime}</td>
                                             <td style={{ padding: "12px", fontSize: "0.85rem", color: "#444" }}>
