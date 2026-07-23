@@ -4,6 +4,7 @@ import {
     type SalesReport
 } from "../services/ReportServices";
 import InfoTooltip from "./InfoTooltip";
+import DatePicker from "./DatePicker";
 
 /**
  * Componente que permite al administrador visualizar el reporte de ventas.
@@ -96,22 +97,12 @@ function SalesReportComponent() {
                 <div className="sales-report-filters">
                     <div className="sales-report-field">
                         <label>Fecha inicio</label>
-                        <input
-                            type="date"
-                            value={startDate}
-                            onChange={(event) => setStartDate(event.target.value)}
-                        />
-                        <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
+                        <DatePicker value={startDate} onChange={setStartDate} />
                     </div>
 
                     <div className="sales-report-field">
                         <label>Fecha término</label>
-                        <input
-                            type="date"
-                            value={endDate}
-                            onChange={(event) => setEndDate(event.target.value)}
-                        />
-                        <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
+                        <DatePicker value={endDate} onChange={setEndDate} />
                     </div>
 
                     <button

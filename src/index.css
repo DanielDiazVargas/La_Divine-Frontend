@@ -88,3 +88,112 @@ body {
     border-color: transparent #F5F0E8 transparent transparent;
     z-index: 1;
 }
+
+/* SELECTOR DE FECHA PERSONALIZADO (DatePicker) */
+.date-picker {
+    display: inline-block;
+}
+
+.date-picker-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-width: 150px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #333333;
+    cursor: pointer;
+    text-align: left;
+}
+
+.date-picker-input:disabled {
+    background: #f0f0f0;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.date-picker-placeholder {
+    color: #888888;
+}
+
+.date-picker-icon {
+    font-size: 14px;
+}
+
+.date-picker-calendar {
+    position: fixed;
+    z-index: 9999;
+    background: #ffffff;
+    border: 1px solid #C0A060;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    padding: 12px;
+    width: 240px;
+}
+
+.date-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #8B0000;
+    font-size: 13px;
+}
+
+.date-picker-header button {
+    background: none;
+    border: none;
+    color: #8B0000;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.date-picker-header button:hover {
+    background: #F5F0E8;
+}
+
+.date-picker-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 11px;
+    color: #999999;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.date-picker-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.date-picker-day {
+    background: none;
+    border: none;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #333333;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.date-picker-day:hover {
+    background: #F5F0E8;
+}
+
+.date-picker-day.selected {
+    background: #8B0000;
+    color: #ffffff;
+    font-weight: bold;
+}

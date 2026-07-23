@@ -2,6 +2,7 @@ import { useState } from "react";
 import { registerFunction } from "../services/FunctionServices.ts";
 import ConfirmModal from "./ConfirmModal";
 import InfoTooltip from "./InfoTooltip";
+import DatePicker from "./DatePicker";
 
 function RegisterFunction() {
     const [formData, setFormData] = useState({
@@ -128,12 +129,11 @@ function RegisterFunction() {
                                     <label style={{ fontWeight: "600", color: "#333", display: "block", marginBottom: "4px" }}>
                                         Fecha de la función
                                     </label>
-                                    <input
-                                        name="dateFunction" type="date" value={formData.dateFunction} onChange={handleChange}
+                                    <DatePicker
+                                        value={formData.dateFunction}
+                                        onChange={(value) => setFormData({ ...formData, dateFunction: value })}
                                         disabled={loading}
-                                        style={{ width: "100%", padding: "8px 12px", border: "1px solid #ccc", borderRadius: "4px", fontSize: "0.95rem", boxSizing: "border-box" }}
                                     />
-                                    <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
                                     {fieldErrors.dateFunction && <span style={{ color: "#f56558", fontSize: "0.75rem" }}>{fieldErrors.dateFunction}</span>}
                                 </div>
 

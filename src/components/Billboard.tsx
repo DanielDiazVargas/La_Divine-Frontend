@@ -4,6 +4,7 @@ import { getBillboardFunctions, type BillboardFunction } from "../services/Billb
 import { getRoleFromToken } from "../services/AuthServices";
 import SeatMap from "./SeatMap";
 import InfoTooltip from "./InfoTooltip";
+import DatePicker from "./DatePicker";
 
 /**
  * Componente unificado que muestra las funciones vigentes de la cartelera.
@@ -219,14 +220,7 @@ function Billboard() {
                     value={nameFilter}
                     onChange={e => setNameFilter(e.target.value)}
                 />
-                <div className="date-filter-wrapper">
-                    <input
-                        type="date"
-                        value={dateFilter}
-                        onChange={e => setDateFilter(e.target.value)}
-                    />
-                    <span className="date-filter-hint">Formato: dd/mm/aaaa</span>
-                </div>
+                <DatePicker value={dateFilter} onChange={setDateFilter} />
                 <button
                     className="billboard-search-button"
                     onClick={handleSearch}
