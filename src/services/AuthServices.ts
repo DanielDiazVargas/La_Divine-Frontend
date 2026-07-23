@@ -65,11 +65,24 @@ export const register = async (dto: any) => {
 export const getRoleFromToken = (): string => {
     const token = getToken();
     if (!token) return "";
-    
+
     // Decodificación de Base64 del segundo segmento del token (payload)
     const payload = JSON.parse(atob(token.split(".")[1]));
-    
+
     return payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ?? "";
+};
+
+export const getEmailFromToken = (): string => {
+    const token = getToken();
+    if (!token) return "";
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    return (
+        payload["email"] ??
+        payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] ??
+        ""
+    );
 };
 
 /**

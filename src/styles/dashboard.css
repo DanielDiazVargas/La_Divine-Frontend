@@ -44,11 +44,17 @@
 .btn-salir {
     background-color: #D64045;
     color: white;
-    border: none;
+    border: 2px solid rgba(255,255,255,0.7);
     padding: 8px 16px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-salir:hover {
+    background-color: #b52d31;
+    border-color: white;
 }
 
 /* CUERPO Y NAVEGACIÓN LATERAL */
@@ -87,20 +93,24 @@
 .sidebar-menu li {
     padding: 15px 20px;
     border-bottom: 1px solid #ddd;
+    border-left: 4px solid transparent;
     color: #8B0000;
     font-weight: bold;
     cursor: pointer;
     white-space: nowrap;
+    transition: background-color 0.2s, border-left-color 0.2s;
 }
 
 .sidebar-menu li:hover {
-    background-color: #f0f0f0;
+    background-color: #F5F0E8;
+    border-left-color: #C0A060;
 }
 
 /* Estilo para el ítem seleccionado */
 .sidebar-menu li.activo {
     background-color: #8B0000;
     color: white;
+    border-left-color: #C0A060;
 }
 
 /* ÁREA DE CONTENIDO PRINCIPAL */
@@ -366,12 +376,45 @@
     padding: 10px 22px;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.billboard-search-button:hover:not(:disabled) {
+    background-color: #a8893a;
 }
 
 /* Estado del botón durante la búsqueda */
 .billboard-search-button:disabled {
     opacity: 0.8;
     cursor: not-allowed;
+}
+
+/* Botones de las cards de cartelera */
+.billboard-card-btn {
+    margin-top: auto;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.2s;
+}
+
+.billboard-card-btn.disponible {
+    background-color: #00a650;
+}
+
+.billboard-card-btn.disponible:hover {
+    background-color: #007a3a;
+}
+
+.billboard-card-btn.no-disponible {
+    background-color: #f56558;
+    cursor: not-allowed;
+    opacity: 0.85;
 }
 
 /* Mensaje de error o resultado vacío */
@@ -498,6 +541,11 @@
     font-size: 22px;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.billboard-reserve-main:hover {
+    background-color: #6a0000;
 }
 
 /* Botón para volver al listado */

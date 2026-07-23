@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMyReservations } from "../services/ReservationService";
+import { getMyReservations, downloadReservationPdf } from "../services/ReservationService";
 import { getProfile } from "../services/AuthServices";
 
 interface Reservation {
@@ -10,7 +10,8 @@ interface Reservation {
     seatCount: number;
     seatNumbers: string[];
     totalPrice: number;
-    status: number; // 0 = Pagada, 1 = Anulada
+    status: number; // 0 = Activa, 1 = Anulada
+    isPaid: boolean;
     createdAt: string;
 }
 
@@ -24,6 +25,7 @@ function MyReservations() {
     const [clientName, setClientName] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [errorMsg, setErrorMsg] = useState("");
+    const [downloadingCode, setDownloadingCode] = useState("");
 
     useEffect(() => {
         // Carga en paralelo el perfil del cliente y sus reservas
@@ -38,6 +40,18 @@ function MyReservations() {
             })
             .finally(() => setIsLoading(false));
     }, []);
+
+    // Descarga la entrada en PDF de una reserva (FUN-005)
+    const handleDownload = async (code: string) => {
+        setDownloadingCode(code);
+        try {
+            await downloadReservationPdf(code);
+        } catch (error: any) {
+            setErrorMsg(error.message || "No se pudo descargar la entrada.");
+        } finally {
+            setDownloadingCode("");
+        }
+    };
 
     if (isLoading) return <p style={{ padding: "24px" }}>Cargando reservas...</p>;
 
@@ -70,6 +84,7 @@ function MyReservations() {
                                         <th style={{ padding: "12px" }}>Asientos reservados</th>
                                         <th style={{ padding: "12px" }}>Precio total</th>
                                         <th style={{ padding: "12px" }}>Estado</th>
+                                        <th style={{ padding: "12px" }}>Entrada</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,7 +94,7 @@ function MyReservations() {
                                             <td style={{ padding: "12px" }}>{clientName}</td>
                                             <td style={{ padding: "12px" }}>{r.functionTitle}</td>
                                             <td style={{ padding: "12px" }}>
-                                                {new Date(r.functionDate).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                                                {new Date(r.functionDate).toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/-/g, "/")}
                                             </td>
                                             <td style={{ padding: "12px" }}>{r.functionTime}</td>
                                             <td style={{ padding: "12px", fontSize: "0.85rem", color: "#444" }}>
@@ -93,13 +108,36 @@ function MyReservations() {
                                                 <span style={{
                                                     padding: "4px 12px",
                                                     borderRadius: "12px",
-                                                    backgroundColor: r.status === 0 ? "#4CAF50" : "#D64045",
+                                                    backgroundColor: r.isPaid ? "#4CAF50" : "#D64045",
                                                     color: "#fff",
                                                     fontWeight: "bold",
                                                     fontSize: "0.85em"
                                                 }}>
-                                                    {r.status === 0 ? "Pagada" : "Anulada"}
+                                                    {r.isPaid ? "Pagada" : "Anulada"}
                                                 </span>
+                                            </td>
+                                            <td style={{ padding: "12px" }}>
+                                                {r.isPaid ? (
+                                                    <button
+                                                        onClick={() => handleDownload(r.reservationCode)}
+                                                        disabled={downloadingCode === r.reservationCode}
+                                                        style={{
+                                                            backgroundColor: "#8B0000",
+                                                            color: "#fff",
+                                                            border: "none",
+                                                            padding: "6px 14px",
+                                                            borderRadius: "4px",
+                                                            fontSize: "12px",
+                                                            fontWeight: "bold",
+                                                            cursor: downloadingCode === r.reservationCode ? "not-allowed" : "pointer",
+                                                            opacity: downloadingCode === r.reservationCode ? 0.7 : 1
+                                                        }}
+                                                    >
+                                                        {downloadingCode === r.reservationCode ? "Generando PDF..." : "Descargar"}
+                                                    </button>
+                                                ) : (
+                                                    <span style={{ color: "#999", fontSize: "12px" }}>—</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

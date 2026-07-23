@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getFunctionSeats,
   createReservation,
@@ -54,6 +55,7 @@ function lighten(hex: string) {
 
 export default function SeatMap({ functionId, functionName, onBack }: SeatMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const navigate = useNavigate();
 
   // Map: seatNumber → SeatDto (datos reales del backend)
   const seatDataMap = useRef<Map<string, SeatDto>>(new Map());
@@ -73,6 +75,8 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
 
   // Modal de confirmación de reserva
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+
+  const [hoverBack, setHoverBack] = useState(false);
 
   // ── NUEVO: Modal de error por asiento no disponible ────────────────────────
   const [showSeatErrorModal, setShowSeatErrorModal] = useState(false);
@@ -258,14 +262,23 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
     setSelectedSeats([]);
   }
 
-  // ── Confirmar reserva ──────────────────────────────────────────────────────
+  // ── Confirmar reserva y navegar al pago ───────────────────────────────────
   async function handleConfirmReserve() {
     setShowConfirmModal(false);
     setConfirming(true);
     setReserveError("");
     try {
       const result = await createReservation(functionId, [...selIds.current]);
-      setReservationResult(result);
+      // Navegación hacia la página de pago pasando los datos de la reserva como state
+      navigate("/payment", {
+        state: {
+          reservationCode: result.reservationCode,
+          totalPrice: result.totalPrice,
+          seats: result.selectedSeats,
+          functionId,
+          functionName,
+        },
+      });
     } catch (e: any) {
       setReserveError(e.message);
     } finally {
@@ -458,7 +471,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
                   fontWeight: "bold", cursor: "pointer"
                 }}
               >
-                Sí, confirmar
+                Sí, proceder al pago
               </button>
             </div>
           </div>
@@ -469,10 +482,14 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
         <button
           onClick={onBack}
+          onMouseEnter={() => setHoverBack(true)}
+          onMouseLeave={() => setHoverBack(false)}
           style={{
-            background: "transparent", border: "1px solid #ccc",
-            borderRadius: 6, padding: "6px 14px",
-            cursor: "pointer", color: "#555", fontSize: 13
+            background: hoverBack ? "#a8893a" : "#C0A060",
+            border: "none", borderRadius: 6,
+            padding: "7px 16px", cursor: "pointer",
+            color: "#fff", fontSize: 13, fontWeight: 600,
+            transition: "background 0.15s",
           }}
         >
           ← Volver
@@ -555,7 +572,7 @@ export default function SeatMap({ functionId, functionName, onBack }: SeatMapPro
               fontWeight: 700, fontSize: 13, cursor: confirming ? "not-allowed" : "pointer"
             }}
           >
-            {confirming ? "Confirmando reserva..." : "Confirmar reserva"}
+            {confirming ? "Procesando..." : "Proceder al pago"}
           </button>
         </div>
       )}
