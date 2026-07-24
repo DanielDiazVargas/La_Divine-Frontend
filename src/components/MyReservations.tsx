@@ -125,9 +125,9 @@ function MyReservations() {
                                                             backgroundColor: "#8B0000",
                                                             color: "#fff",
                                                             border: "none",
-                                                            padding: "6px 14px",
-                                                            borderRadius: "4px",
-                                                            fontSize: "12px",
+                                                            padding: "4px 12px",
+                                                            borderRadius: "12px",
+                                                            fontSize: "0.85em",
                                                             fontWeight: "bold",
                                                             cursor: downloadingCode === r.reservationCode ? "not-allowed" : "pointer",
                                                             opacity: downloadingCode === r.reservationCode ? 0.7 : 1
